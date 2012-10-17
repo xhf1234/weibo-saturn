@@ -36,3 +36,9 @@ class User(object):
             u = User.decodeFromDict(v)
             userList.append(u)
         return userList
+
+    @staticmethod
+    def extractIds(userList):
+        def extract(user):
+            return user.uid
+        return map(extract, userList)
