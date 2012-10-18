@@ -8,21 +8,33 @@ from data import User
 class WeiboClient(object):
 
     def dumpFriends(self, uid, access_token):
+        page = 1
+        rList = []
+        while True:
+            friends = self.__dumpFriends(uid, access_token, page)
+            if len(friends) == 0:
+                break 
+            rList.extend(friends)
+            page = page + 1
+        return rList
+
+    def __dumpFriends(self, uid, access_token, page):
         conn = httplib.HTTPSConnection("api.weibo.com")
-        conn.request("GET", "/2/friendships/friends/bilateral.json?uid=%d&access_token=%s" %(uid, access_token))
+        conn.request("GET", "/2/friendships/friends/bilateral.json?page=%d&count=200&uid=%d&access_token=%s" %(page, uid, access_token))
         resp = conn.getresponse()
         if resp.status != 200:
-            raise ApiException(resp.status, resp.reason)
+            raise ApiException(resp)
         strJson = resp.read()
         return User.decodeList(strJson) 
 
 class ApiException(Exception):
-    def __init__(self, status, reason):
-        self.status = status
-        self.reason = reason
+    def __init__(self, resp):
+        self.status = resp.status
+        self.reason = resp.reason
+        self.resp = resp.read()
 
     def __str__(self):
-        return "%d %s" %(self.status, self.reason)
+        return "%d %s %s" %(self.status, self.reason, self.resp)
     
 
 if __name__ == '__main__':

@@ -15,8 +15,10 @@ class UserStore(AbsRedisStore):
     FIELD_NAME = "name"
     FIELD_UID = "uid"
 
+    __key_prefix = "wb:user:"
+
     def __getKey(self, uid):
-        return "wb:user:%d" % uid
+        return self.__key_prefix + str(uid)
 
     def saveUser(self, user):
         client = self._bollowRedis()
@@ -29,6 +31,11 @@ class UserStore(AbsRedisStore):
         key = self.__getKey(uid)
         name = client.hget(key, UserStore.FIELD_NAME)
         return User(uid, name)
+
+    def count(self):
+        client = self._bollowRedis()
+        keys = client.keys(self.__key_prefix + "*")
+        return len(keys)
 
 class FriendsStore(AbsRedisStore):
 
@@ -45,16 +52,38 @@ class FriendsStore(AbsRedisStore):
         key = self.__getKey(uid)
         return client.smembers(key)
 
+    def count(self, uid):
+        client = self._bollowRedis()
+        key = self.__getKey(uid)
+        return client.scard(key)
+
+    def exists(self, uid):
+        count = self.count(uid)
+        return count != 0
+
+class Queue(AbsRedisStore):
+    __key = "wb:queue"
+    
+    def enqueue(self, uid):
+        client = self._bollowRedis()
+        client.zincrby(self.__key, uid, 1)
+
+    def dequeue(self):
+        client = self._bollowRedis()
+        tList = client.zrevrange(self.__key, 0, 0)
+        value = None
+        if len(tList) > 0:
+            value = tList[0]
+            client.zrem(self.__key, value)
+        return int(value)
+
+    def count(self):
+        client = self._bollowRedis()
+        return client.zcard(self.__key)
 
 if __name__ == '__main__':
     userStore = UserStore()
     friendsStore = FriendsStore()
+    queue = Queue()
 
-    uid = 2207639514
-    client = WeiboClient()
-    uList = client.dumpFriends(uid, "2.006oOL1DnB3GRCff1ae130c0n4ySvC")
-    friendIds = User.extractIds(uList)
-    friendsStore.saveFriends(uid, friendIds)
-    friendIds = friendsStore.getFriends(uid)
-
-    print Utils.listToStr(friendIds)
+    print queue.count()
