@@ -11,7 +11,7 @@ client = WeiboClient()
 
 def main():
     initId = 2207639514
-    access_token = "2.006oOL1DnB3GRCff1ae130c0n4ySvC"
+    access_token = "2.006oOL1DnB3GRC97a59379120KoVZG"
 
     if queue.count()==0:
         queue.enqueue(initId)
