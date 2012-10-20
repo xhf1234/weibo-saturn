@@ -90,4 +90,4 @@ if __name__ == '__main__':
     friendsStore = FriendsStore()
     queue = Queue()
 
-    print queue.count()
+    print userStore.count()

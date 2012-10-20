@@ -9,7 +9,11 @@
     var Handler = require('./Handler');
     var InitHandler = Handler.extend('init', 'GET');
     InitHandler.prototype.handle = function (req, resp) {
-        console.log('handle');
+        var Store = require('../Store');
+        var uid = 2207639514;
+        Store.getUser(uid, function (user) {
+            console.log(user);
+        });
     };
 
     var ctrl = new WeiboController();
