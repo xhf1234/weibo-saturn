@@ -8,7 +8,7 @@ from utils import Utils
 class AbsRedisStore(object):
 
     def _bollowRedis(self):
-        return redis.StrictRedis(host='localhost', port=6379, db=0)
+        return redis.StrictRedis(host='166.111.137.218', port=6379, db=0)
 
 class UserStore(AbsRedisStore):
     
@@ -76,6 +76,10 @@ class Queue(AbsRedisStore):
             value = tList[0]
             client.zrem(self.__key, value)
         return int(value)
+
+    def putFront(self, uid):
+        client = self._bollowRedis()
+        client.zadd(self.__key, 10000, uid)
 
     def count(self):
         client = self._bollowRedis()
