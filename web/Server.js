@@ -12,5 +12,6 @@
     server.listen(8008, '127.0.0.1');
 
     require('./ctrl/MustacheController');
+    require('./ctrl/WeiboController');
 
 }());

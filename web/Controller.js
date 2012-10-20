@@ -12,16 +12,32 @@
     };
 
     Controller.prototype.onRequest = function (req, resp) {
-        //abstract method
+        this._handlers = this._handlers || [];
+        var path = require('./HttpUtils').getPath(req);
+        var method = req.method;
+        this._handlers.forEach(function (handler) {
+            if (handler.match(path, method)) {
+                handler.handle(req, resp);
+            }
+        }, this);
     };
 
     Controller.prototype.match = function (path, method) {
-        //abstract method
-        return false;
+        this._handlers = this._handlers || [];
+        return this._handlers.some(function (handler) {
+            return handler.match(path, method);
+        }, this);
     };
 
-    exports.extend = function () {
+    Controller.prototype.addHandler = function (handler) {
+        handler.controller = this;
+        this._handlers = this._handlers || [];
+        this._handlers.push(handler);
+    };
+
+    exports.extend = function (path) {
         var SubController = function () {
+            this.path = path;
         };
         SubController.prototype = new Controller();
         return SubController;

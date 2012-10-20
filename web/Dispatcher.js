@@ -15,7 +15,7 @@
 
         var handled = controllers.some(function (controller) {
             if (controller.match(path, req.method)) {
-                controller.onRequest.call(this, req, resp);
+                controller.onRequest(req, resp);
                 return true;
             }
             return false;
