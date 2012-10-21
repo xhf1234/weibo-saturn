@@ -5,7 +5,11 @@
     "use strict";
 
     exports.getPath = function (request) {
-        return request.url.substring(1);
+        return require('url').parse(request.url).pathname.substr(1);
+    };
+
+    exports.getParams = function (request) {
+        return require('url').parse(request.url, true).query;
     };
 
     var serveFile = function (req, resp, file, type) {

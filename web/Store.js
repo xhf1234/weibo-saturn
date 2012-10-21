@@ -14,11 +14,11 @@
         client.on("connect", function () {
             client.hget('wb:user:' + uid, 'name', function (error, result) {
                 if (error) {
-                    console.error(error);
+                    callback(error, null);
                 } else {
                     var User = require('./data').User;
                     var user = new User(uid, result);
-                    callback(user);
+                    callback(null, user);
                 }
             });
         });
@@ -28,10 +28,11 @@
         client.on("connect", function () {
             client.smembers('wb:friendids:' + uid, function (error, result) {
                 if (error) {
-                    console.error(error);
+                    callback(error, null);
                 } else {
                     var friendIds = result;
-                    callback(friendIds);
+                    var async = require('async');
+                    async.map(friendIds, exports.getUser, callback);
                 }
             });
         });

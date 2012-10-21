@@ -7,16 +7,18 @@
     var WeiboController = require('../Controller').extend('weibo');
 
     var Handler = require('./Handler');
-    var InitHandler = Handler.extend('init', 'GET');
-    InitHandler.prototype.handle = function (req, resp) {
+    var GetUserHandler = Handler.extend('user', 'GET');
+    GetUserHandler.prototype.handle = function (req, resp) {
+        var params = require('../HttpUtils').getParams(req);
+        var uid = params.uid;
         var Store = require('../Store');
-        var uid = 2207639514;
-        Store.getUser(uid, function (user) {
-            console.log(user);
+        Store.getUser(uid, function (error, user) {
+            resp.writeHead(200, { 'Content-Type': 'application/json'});
+            resp.end(JSON.stringify(user), 'utf-8');
         });
     };
 
     var ctrl = new WeiboController();
-    ctrl.addHandler(new InitHandler());
+    ctrl.addHandler(new GetUserHandler());
     ctrl.init();
 }());
