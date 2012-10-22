@@ -52,7 +52,7 @@ define(function (require, exports, module) {
                     // pt2:  {x:#, y:#}  target position in screen coords
 
                     // draw a line from pt1 to pt2
-                    ctx.strokeStyle = "rgba(0,0,0, .333)";
+                    ctx.strokeStyle = "(0,0,0, .333)";
                     ctx.lineWidth = 1;
                     ctx.beginPath();
                     ctx.moveTo(pt1.x, pt1.y);
@@ -64,10 +64,9 @@ define(function (require, exports, module) {
                     // node: {mass:#, p:{x,y}, name:"", data:{}}
                     // pt:   {x:#, y:#}  node position in screen coords
 
-                    // draw a rectangle centered at pt
-                    var w = 10;
-                    ctx.fillStyle = (node.data.alone) ? "orange" : "black";
-                    ctx.fillRect(pt.x - w / 2, pt.y - w / 2, w, w);
+                    ctx.fillStyle = "blue";
+                    ctx.font = "bold 16px Arial";
+                    ctx.fillText("Zibri", pt.x, pt.y);
                 });
             },
       

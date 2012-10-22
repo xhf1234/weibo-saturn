@@ -25,23 +25,31 @@
                 callback(error, null);
             } else {
                 var redisHost = this.get('redis.host');
-                callback(null, redisHost);
+                var initUid = this.get('init.uid');
+                var result = {};
+                result.redisHost = redisHost;
+                result.initUid = initUid;
+                callback(null, result);
             }
         });
     };
     // load local.config
     var loadLocal = function (callback) {
+        var result = {};
         if (fs.existsSync(getConfig('local.config'))) {
             new Properties().load(getConfig('local.config'), function (error) {
                 if (error) {
                     callback(error, null);
                 } else {
                     var redisHost = this.get('redis.host');
-                    callback(null, redisHost);
+                    var initUid = this.get('init.uid');
+                    result.redisHost = redisHost;
+                    result.initUid = initUid;
+                    callback(null, result);
                 }
             });
         } else {
-            callback(null, null);
+            callback(null, result);
         }
     };
     // call this when load config done
@@ -49,10 +57,15 @@
         if (error) {
             console.error(error);
         } else {
-            if (results[1]) {// redisHost exists in local.config
-                exports.redisHost = results[1];
+            if (results[1].redisHost) {// redisHost exists in local.config
+                exports.redisHost = results[1].redisHost;
             } else {
-                exports.redisHost = results[0];
+                exports.redisHost = results[0].redisHost;
+            }
+            if (results[1].initUid) {
+                exports.initUid = results[1].initUid;
+            } else {
+                exports.initUid = results[0].initUid;
             }
         }
         done = true;

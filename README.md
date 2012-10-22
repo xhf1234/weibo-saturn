@@ -11,3 +11,4 @@ or
     
 # nodejs redis https://github.com/mranney/node_redis
 # npm install properties
+# npm install async

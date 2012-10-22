@@ -11,6 +11,9 @@
         return client;
     };
     exports.getUser = function (uid, callback) {
+        if (!uid) {
+            throw "uid=" + uid;
+        }
         var client = getClient();
         client.on("connect", function () {
             client.hget('wb:user:' + uid, 'name', function (error, result) {
