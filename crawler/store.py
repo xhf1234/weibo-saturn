@@ -3,12 +3,13 @@
 import redis
 from weibo import WeiboClient
 from data import User
-from utils import Utils
+from utils import Utils,Properties
+import const
 
 class AbsRedisStore(object):
-
+    
     def _bollowRedis(self):
-        return redis.StrictRedis(host='166.111.137.218', port=6379, db=0)
+        return redis.StrictRedis(host=const.redisHost, port=6379, db=0)
 
 class UserStore(AbsRedisStore):
     
