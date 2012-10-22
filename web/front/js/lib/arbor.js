@@ -8,6 +8,7 @@ define(function (require, exports, module) {
     var $ = require('/lib/jquery');
 
     var _mouseP  = null;
+    var clickCallback = null;
     var Renderer = function (c) {
         var canvas = $(c).get(0);
         var ctx = canvas.getContext("2d");
@@ -66,7 +67,7 @@ define(function (require, exports, module) {
 
                     ctx.fillStyle = "blue";
                     ctx.font = "bold 16px Arial";
-                    ctx.fillText("Zibri", pt.x, pt.y);
+                    ctx.fillText(node.data.name, pt.x, pt.y);
                 });
             },
       
@@ -89,6 +90,11 @@ define(function (require, exports, module) {
 
                         $(canvas).bind('mousemove', handler.dragged);
                         $(window).bind('mouseup', handler.dropped);
+
+                        var nearest = particleSystem.nearest(_mouseP);
+                        if (clickCallback && nearest.distance < 50) {
+                            clickCallback(nearest.node.data);
+                        }
 
                         return false;
                     },
@@ -132,6 +138,10 @@ define(function (require, exports, module) {
     var sys = Arbor.ParticleSystem(1000, 600, 0.5); // create the system with sensible repulsion/stiffness/friction
     sys.parameters({gravity : true}); // use center-gravity to make the graph settle nicely (ymmv)
     sys.renderer = new Renderer("#viewport"); // our newly created renderer will have its .init() method called shortly by sys...
+
+    sys.setClickCallback = function (callback) {
+        clickCallback = callback;
+    };
 
     return sys;
 });

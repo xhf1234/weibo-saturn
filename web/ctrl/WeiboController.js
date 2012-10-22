@@ -43,11 +43,17 @@
                 view.init(tpl_base);
                 view.debug(true);
                 var data = {};
-                console.log(user);
                 data.user = JSON.stringify(user);
-                var html = view.render('weibo.html', data);
-                resp.writeHead(200, { 'Content-Type': 'text/html'});
-                resp.end(html, 'utf-8');
+                Store.getFriends(uid, function (error, friends) {
+                    if (error) {
+                        onError(req, resp, error);
+                    } else {
+                        data.friends = JSON.stringify(friends);
+                        var html = view.render('weibo.html', data);
+                        resp.writeHead(200, { 'Content-Type': 'text/html'});
+                        resp.end(html, 'utf-8');
+                    }
+                });
             }
         });
     };
