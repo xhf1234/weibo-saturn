@@ -4,14 +4,16 @@
 (function () {
     "use strict";
 
-    var requestListener = function (req, resp) {
-        require('./Dispatcher').dispatch(req, resp);
-    };
+    require('./Bootstrap').ready(function () {
+        var requestListener = function (req, resp) {
+            require('./Dispatcher').dispatch(req, resp);
+        };
 
-    var server = require('http').createServer(requestListener);
-    server.listen(8008, '127.0.0.1');
+        var server = require('http').createServer(requestListener);
+        server.listen(8008, '127.0.0.1');
 
-    require('./ctrl/MustacheController');
-    require('./ctrl/WeiboController');
+        require('./ctrl/MustacheController');
+        require('./ctrl/WeiboController');
+    });
 
 }());

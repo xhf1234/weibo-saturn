@@ -10,3 +10,4 @@ or
     pip install hiredis       
     
 # nodejs redis https://github.com/mranney/node_redis
+# npm install properties

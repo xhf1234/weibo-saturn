@@ -4,9 +4,10 @@
 (function () {
     "use strict";
 
+    var redisHost = require('./Const').redisHost;
     var getClient = function () {
         var redis = require('redis');
-        var client = redis.createClient(6379, '166.111.137.218');
+        var client = redis.createClient(6379, redisHost);
         return client;
     };
     exports.getUser = function (uid, callback) {

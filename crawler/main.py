@@ -4,6 +4,7 @@ from store import Queue, UserStore, FriendsStore
 from weibo import WeiboClient, ApiException
 from data import User
 import time
+import const
 
 queue = Queue()
 userStore = UserStore()
@@ -11,11 +12,11 @@ friendsStore = FriendsStore()
 client = WeiboClient()
 
 def main():
-    initId = 2207639514
-    access_token = "2.006oOL1DnB3GRC97a59379120KoVZG"
+    initUid = const.initUid
+    access_token = const.accessToken
 
     if queue.count()==0:
-        queue.enqueue(initId)
+        queue.enqueue(initUid)
 
     while True:
         uid = queue.dequeue()
