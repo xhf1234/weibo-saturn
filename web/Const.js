@@ -47,6 +47,7 @@
                     var initUid = this.get('init.uid');
                     result.redisHost = redisHost;
                     var port = this.get('web.port');
+                    console.log('port = ' + port);
                     result.redisHost = redisHost;
                     result.initUid = initUid;
                     result.webPort = port;
