@@ -135,7 +135,7 @@ define(function (require, exports, module) {
         return that;
     };
 
-    var sys = Arbor.ParticleSystem(1000, 600, 0.5); // create the system with sensible repulsion/stiffness/friction
+    var sys = Arbor.ParticleSystem(10, 600, 0.5); // create the system with sensible repulsion/stiffness/friction
     sys.parameters({gravity : true}); // use center-gravity to make the graph settle nicely (ymmv)
     sys.renderer = new Renderer("#viewport"); // our newly created renderer will have its .init() method called shortly by sys...
 

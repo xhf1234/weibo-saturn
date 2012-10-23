@@ -29,6 +29,7 @@
         });
     };
 
+    /* weibo */
     var InitHandler = Handler.extend(null, 'GET');
     InitHandler.prototype.handle = function (req, resp) {
         var uid = require('../Const').initUid;
@@ -57,9 +58,26 @@
             }
         });
     };
+    
+    var ExpandHandler = Handler.extend('expand', 'GET');
+    ExpandHandler.prototype.handle = function (req, resp) {
+        var params = require('../HttpUtils').getParams(req);
+        var uid = params.uid;
+        var Store = require('../Store');
+        Store.getFriends(uid, function (error, friends) {
+            if (error) {
+                onError(req, resp, error);
+            } else {
+                resp.writeHead(200, { 'Content-Type': 'application/json'});
+                resp.end(JSON.stringify(friends), 'utf-8');
+            }
+        });
+        
+    };
 
     var ctrl = new WeiboController();
     ctrl.addHandler(new GetUserHandler());
     ctrl.addHandler(new InitHandler());
+    ctrl.addHandler(new ExpandHandler());
     ctrl.init();
 }());

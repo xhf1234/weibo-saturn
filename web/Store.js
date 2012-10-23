@@ -12,7 +12,8 @@
     };
     exports.getUser = function (uid, callback) {
         if (!uid) {
-            throw "uid=" + uid;
+            console.error('uid === null');
+            return null;
         }
         var client = getClient();
         client.on("connect", function () {
@@ -36,7 +37,13 @@
                 } else {
                     var friendIds = result;
                     var async = require('async');
-                    async.map(friendIds, exports.getUser, callback);
+                    var callbackFilter = function (error, friends) {
+                        friends = friends.filter(function (user) {
+                            return user;
+                        });
+                        callback(null, friends);
+                    };
+                    async.map(friendIds, exports.getUser, callbackFilter);
                 }
             });
         });

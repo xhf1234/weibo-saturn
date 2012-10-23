@@ -17,7 +17,11 @@
         var method = req.method;
         this._handlers.forEach(function (handler) {
             if (handler.match(path, method)) {
-                handler.handle(req, resp);
+                try {
+                    handler.handle(req, resp);
+                } catch (error) {
+                    console.error(error);
+                }
             }
         }, this);
     };
