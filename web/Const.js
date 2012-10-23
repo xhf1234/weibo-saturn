@@ -26,9 +26,11 @@
             } else {
                 var redisHost = this.get('redis.host');
                 var initUid = this.get('init.uid');
+                var port = this.get('web.port');
                 var result = {};
                 result.redisHost = redisHost;
                 result.initUid = initUid;
+                result.webPort = port;
                 callback(null, result);
             }
         });
@@ -44,7 +46,10 @@
                     var redisHost = this.get('redis.host');
                     var initUid = this.get('init.uid');
                     result.redisHost = redisHost;
+                    var port = this.get('web.port');
+                    result.redisHost = redisHost;
                     result.initUid = initUid;
+                    result.webPort = port;
                     callback(null, result);
                 }
             });
@@ -66,6 +71,11 @@
                 exports.initUid = results[1].initUid;
             } else {
                 exports.initUid = results[0].initUid;
+            }
+            if (results[1].webPort) {
+                exports.webPort = results[1].webPort;
+            } else {
+                exports.webPort = results[0].webPort;
             }
         }
         done = true;

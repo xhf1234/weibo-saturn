@@ -10,7 +10,7 @@
         };
 
         var server = require('http').createServer(requestListener);
-        server.listen(8008, '127.0.0.1');
+        server.listen(require('./Const').webPort, '127.0.0.1');
 
         require('./ctrl/MustacheController');
         require('./ctrl/WeiboController');
