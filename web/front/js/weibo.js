@@ -10,45 +10,42 @@ define(function (require, exports, module) {
     var friends = PageData.get('friends');
     var $ = require('/lib/jquery');
 
-    var randomSelect = function (array, limit) {
-        if (limit >= array.length) {
-            return array;
-        }
-        var result = [];
-        var i = 0;
-        var r = null;
-        var t = null;
-        var remain = array.length;
-        while (i !== limit) {
-            r = Math.floor((Math.random() * remain));
-            result.push(array[r]);
-            //swap
-            t = array[r];
-            array[r] = array[remain - 1];
-            array[remain - 1] = t;
-
-            i = i + 1;
-            remain = remain - 1;
-        }
-        return result;
+    var cache = {};
+    cache.add = function (uid, friends) {
+        var data = {
+            friends: friends,
+            index: 0
+        };
+        this[uid] = data;
     };
-
-    var expand = function (user, friends) {
-        friends = randomSelect(friends, 5);
-        friends.forEach(function (friend) {
+    cache.add(user.uid, friends);
+    var expand = function (user) {
+        var data = cache[user.uid];
+        var friends = data.friends;
+        var index = data.index;
+        var friend = null;
+        while (index < friends.length && index - data.index < 5) {
+            friend = friends[index];
             Arbor.addNode(friend.uid, friend);
             Arbor.addEdge(user.uid, friend.uid);
-        });
+            index = index + 1;
+        }
+        data.index = index;
     };
 
     Arbor.addNode(user.uid, user);
-    expand(user, friends);
+    expand(user);
     Arbor.setClickCallback(function (user) {
-        $.getJSON('/weibo/expand', {
-            uid: user.uid
-        }, function (friends) {
-            expand(user, friends);
-        });
+        if (cache[user.uid]) {
+            expand(user);
+        } else {
+            $.getJSON('/weibo/expand', {
+                uid: user.uid
+            }, function (friends) {
+                cache.add(user.uid, friends);
+                expand(user);
+            });
+        }
     });
 
 /*
