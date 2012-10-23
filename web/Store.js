@@ -4,10 +4,14 @@
 (function () {
     "use strict";
 
+    var User = require('./data').User;
     var redisHost = require('./Const').redisHost;
     var getClient = function () {
         var redis = require('redis');
         var client = redis.createClient(6379, redisHost);
+        client.on('error', function (error) {
+            console.error(error);
+        });
         return client;
     };
     exports.getUser = function (uid, callback) {
@@ -21,7 +25,6 @@
                 if (error) {
                     callback(error, null);
                 } else {
-                    var User = require('./data').User;
                     var user = new User(uid, result);
                     callback(null, user);
                 }
@@ -36,14 +39,21 @@
                     callback(error, null);
                 } else {
                     var friendIds = result;
-                    var async = require('async');
-                    var callbackFilter = function (error, friends) {
-                        friends = friends.filter(function (user) {
-                            return user;
-                        });
-                        callback(null, friends);
-                    };
-                    async.map(friendIds, exports.getUser, callbackFilter);
+                    var multi = client.multi();
+                    friendIds.forEach(function (friendId) {
+                        multi.hget('wb:user:' + friendId, 'name');
+                    });
+                    multi.exec(function (error, names) {
+                        var results = [];
+                        var i = 0;
+                        while (i < friendIds.length) {
+                            if (names[i]) {
+                                results.push(new User(friendIds[i], names[i]));
+                            }
+                            i = i + 1;
+                        }
+                        callback(null, results);
+                    });
                 }
             });
         });

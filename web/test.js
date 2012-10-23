@@ -5,6 +5,6 @@
     "use strict";
     
     require('./Bootstrap').ready(function () {
-        require('./Store');
+        require('./Store').getFriends(require('./Const').initUid);
     });
 }());
