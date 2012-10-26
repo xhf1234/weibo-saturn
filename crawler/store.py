@@ -6,10 +6,12 @@ from data import User
 from utils import Utils,Properties
 import const
 
+pool = redis.ConnectionPool(host=const.redisHost, port=6379, db=0)
+
 class AbsRedisStore(object):
     
     def _bollowRedis(self):
-        return redis.StrictRedis(host=const.redisHost, port=6379, db=0)
+        return redis.Redis(connection_pool = pool)
 
 class UserStore(AbsRedisStore):
     

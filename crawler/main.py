@@ -31,6 +31,11 @@ def main():
             queue.putFront(uid)
             time.sleep(60)
             continue
+        except:
+            print 'exception'
+            queue.putFront(uid)
+            time.sleep(60)
+            continue
         friendIds = User.extractIds(friends)
         friendsStore.saveFriends(uid, friendIds)
         for user in friends:
@@ -38,7 +43,6 @@ def main():
             if not friendsStore.exists(user.uid):
                 queue.enqueue(user.uid)
         print userStore.count()
-        time.sleep(4)
 
 if __name__ == '__main__':
     main()
