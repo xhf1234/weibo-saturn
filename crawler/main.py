@@ -28,11 +28,9 @@ def main():
             print e
             if e.status==403 and e.reason=="Forbidden":
                 print "sleeping... for api rate limit"
-                queue.putFront(uid)
-                time.sleep(60)
-                continue
-            else:
-                raise
+            queue.putFront(uid)
+            time.sleep(60)
+            continue
         friendIds = User.extractIds(friends)
         friendsStore.saveFriends(uid, friendIds)
         for user in friends:
