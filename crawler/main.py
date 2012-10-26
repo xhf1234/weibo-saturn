@@ -42,10 +42,10 @@ def main():
         print 'step4: save every friend in user store'
         userStore.saveUsers(friends)
         print 'step5: get enqueue list'
-        counts = friendsStore.counts(friendIds)
+        existList = friendsStore.existPipe(friendIds)
         enqueueList = []
         for i in range(len(friendIds)):
-            if counts[i] != 0:
+            if existList[i] == False:
                 enqueueList.append(friendIds[i])
         print 'step6: enqueue'
         queue.enqueuePipe(enqueueList)

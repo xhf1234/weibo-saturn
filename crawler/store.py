@@ -64,7 +64,7 @@ class FriendsStore(AbsRedisStore):
             client.sadd(key, *friendIds)
         else:
             key = self.__getEmptyKey(uid)
-            client.mset(key, '0')
+            client.set(key, '0')
 
     def getFriends(self, uid):
         client = self._bollowRedis()
@@ -84,6 +84,26 @@ class FriendsStore(AbsRedisStore):
             key = self.__getKey(uid)
             pipe.scard(key)
         return pipe.execute()
+
+    def existPipe(self, uids):
+        client = self._bollowRedis()
+        counts = self.counts(uids)
+        keys = map(self.__getKey, uids)
+        emptyKeys = []
+        indexList = []
+        for i in range(len(keys)):
+            if counts[i] == 0:
+                emptyKeys.append(keys[i])
+                indexList.append(i)
+        pipe = client.pipeline()
+        for key in emptyKeys:
+            pipe.get(key)
+        emptyResult = pipe.execute()
+        r = [True]*len(keys)
+        for i in range(len(emptyResult)):
+            if emptyResult[i] == None:
+                r[indexList[i]] = False 
+        return r
 
     def uids(self):
         """ get the uid list """
