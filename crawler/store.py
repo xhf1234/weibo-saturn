@@ -53,6 +53,9 @@ class UserStore(AbsRedisStore):
 
 class FriendsStore(AbsRedisStore):
 
+    def __getEmptyKey(self, uid):
+        return "wb:empty:friendids:%d" % uid
+
     def __getKey(self, uid):
         return "wb:friendids:%d" % uid
 
@@ -62,7 +65,8 @@ class FriendsStore(AbsRedisStore):
         if len(friendIds) != 0:
             client.sadd(key, *friendIds)
         else:
-            print 'save Friends', friendIds
+            key = self.__getEmptyKey(uid)
+            client.mset(key, '0')
 
     def getFriends(self, uid):
         client = self._bollowRedis()
@@ -87,15 +91,22 @@ class FriendsStore(AbsRedisStore):
         """ get the uid list """
         client = self._bollowRedis()
         keys = client.keys('wb:friendids:*')
-        
         def extractId(key):
             return int(key[13:])
-        return map(extractId, keys)
+        r1 = map(extractId, keys)
+
+        keys = client.keys('wb:empty:friendids:*')
+        def extractEmptyId(key):
+            return int(key[19:])
+        r2 = map(extractEmptyId, keys)
+        r1.extend(r2)
+        return r1
 
     def keyCount(self) :
         client = self._bollowRedis()
         keys = client.keys('wb:friendids:*')
-        return len(keys)
+        emptyKeys = client.keys('wb:empty:friendids:*')
+        return len(keys) + len(emptyKeys)
 
 class Queue(AbsRedisStore):
     __key = "wb:queue"
