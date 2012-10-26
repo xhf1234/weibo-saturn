@@ -58,6 +58,29 @@ class FriendsStore(AbsRedisStore):
         key = self.__getKey(uid)
         return client.scard(key)
 
+    def counts(self, uids):
+        """ get the count list for the uid list """
+        client = self._bollowRedis()
+        pipe = client.pipeline()
+        for uid in uids:
+            key = self.__getKey(uid)
+            pipe.scard(key)
+        return pipe.execute()
+
+    def uids(self):
+        """ get the uid list """
+        client = self._bollowRedis()
+        keys = client.keys('wb:friendids:*')
+        
+        def extractId(key):
+            return int(key[13:])
+        return map(extractId, keys)
+
+    def keyCount(self) :
+        client = self._bollowRedis()
+        keys = client.keys('wb:friendids:*')
+        return len(keys)
+
     def exists(self, uid):
         count = self.count(uid)
         return count != 0
