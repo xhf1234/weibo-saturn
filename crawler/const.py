@@ -21,9 +21,10 @@ def __readConfig(path):
         print 'read config',key,value
         globals()[key] = value
 
-__base = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-__readConfig(__base + '/default.config')
-if os.path.exists(__base + '/local.config'):
-    __readConfig(__base + '/local.config')
+def loadConfig():
+    __base = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+    __readConfig(__base + '/default.config')
+    if os.path.exists(__base + '/local.config'):
+        __readConfig(__base + '/local.config')
 
-        
+loadConfig()
