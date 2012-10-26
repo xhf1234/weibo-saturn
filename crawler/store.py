@@ -25,9 +25,20 @@ class UserStore(AbsRedisStore):
 
     def saveUser(self, user):
         client = self._bollowRedis()
+        pipe = client.pipeline()
         key = self.__getKey(user.uid)
-        client.hset(key, UserStore.FIELD_UID, user.uid)
-        client.hset(key, UserStore.FIELD_NAME, user.name)
+        pipe.hset(key, UserStore.FIELD_UID, user.uid)
+        pipe.hset(key, UserStore.FIELD_NAME, user.name)
+        pipe.execute()
+
+    def saveUsers(self, users):
+        client = self._bollowRedis()
+        pipe = client.pipeline()
+        for user in users:
+            key = self.__getKey(user.uid)
+            pipe.hset(key, UserStore.FIELD_UID, user.uid)
+            pipe.hset(key, UserStore.FIELD_NAME, user.name)
+        pipe.execute()
 
     def getUser(self, uid):
         client = self._bollowRedis()
@@ -48,7 +59,10 @@ class FriendsStore(AbsRedisStore):
     def saveFriends(self, uid, friendIds):
         client = self._bollowRedis()
         key = self.__getKey(uid)
-        client.sadd(key, *friendIds)
+        if len(friendIds) != 0:
+            client.sadd(key, *friendIds)
+        else:
+            print 'save Friends', friendIds
 
     def getFriends(self, uid):
         client = self._bollowRedis()
@@ -83,16 +97,19 @@ class FriendsStore(AbsRedisStore):
         keys = client.keys('wb:friendids:*')
         return len(keys)
 
-    def exists(self, uid):
-        count = self.count(uid)
-        return count != 0
-
 class Queue(AbsRedisStore):
     __key = "wb:queue"
     
     def enqueue(self, uid):
         client = self._bollowRedis()
         client.zincrby(self.__key, uid, 1)
+
+    def enqueuePipe(self, uids):
+        client = self._bollowRedis()
+        pipe = client.pipeline()
+        for uid in uids:
+            pipe.zincrby(self.__key, uid, 1)
+        pipe.execute()
 
     def dequeue(self):
         client = self._bollowRedis()

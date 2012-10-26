@@ -6,13 +6,14 @@ from data import User
 
 
 class WeiboClient(object):
+    pageSize = 200
 
     def dumpFriends(self, uid, access_token):
         page = 1
         rList = []
         while True:
             friends = self.__dumpFriends(uid, access_token, page)
-            if len(friends) == 0:
+            if len(friends) != self.pageSize:
                 break 
             rList.extend(friends)
             page = page + 1
@@ -20,7 +21,7 @@ class WeiboClient(object):
 
     def __dumpFriends(self, uid, access_token, page):
         conn = httplib.HTTPSConnection("api.weibo.com")
-        conn.request("GET", "/2/friendships/friends/bilateral.json?page=%d&count=200&uid=%d&access_token=%s" %(page, uid, access_token))
+        conn.request("GET", "/2/friendships/friends/bilateral.json?page=%d&count=%d&uid=%d&access_token=%s" %(page, self.pageSize, uid, access_token))
         resp = conn.getresponse()
         if resp.status != 200:
             raise ApiException(resp)
