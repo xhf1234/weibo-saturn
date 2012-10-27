@@ -59,6 +59,12 @@ class FriendsStore(AbsRedisStore):
     def __getKey(self, uid):
         return "wb:friendids:%d" % uid
 
+    def __extractId(key):
+        return int(key[13:])
+
+    def __extractEmptyId(self, key):
+        return int(key[19:])
+
     def saveFriends(self, uid, friendIds):
         client = self._bollowRedis()
         key = self.__getKey(uid)
@@ -111,16 +117,33 @@ class FriendsStore(AbsRedisStore):
         """ get the uid list """
         client = self._bollowRedis()
         keys = client.keys('wb:friendids:*')
-        def extractId(key):
-            return int(key[13:])
-        r1 = map(extractId, keys)
+        r1 = map(self.__extractId, keys)
 
         keys = client.keys('wb:empty:friendids:*')
-        def extractEmptyId(key):
-            return int(key[19:])
-        r2 = map(extractEmptyId, keys)
+        r2 = map(self.__extractEmptyId, keys)
         r1.extend(r2)
         return r1
+
+    def delEmpty(self, uid):
+        client = self._bollowRedis()
+        key = self.__getEmptyKey(uid)
+        client.delete(key)
+
+    def filterUids(self, count):
+        """ get uid list which count == $count """
+        client = self._bollowRedis()
+        if count == 0:
+            keys = client.keys('wb:empty:friendids:*')
+            return map(self.__extractEmptyId, keys)
+        else:
+            keys = client.keys('wb:friendids:*')
+            uids = map(self.__extractId, keys)
+            counts = self.counts(uids)
+            r = []
+            for i in range(len(uids)):
+                if counts[i] == count:
+                    r.append(uids[i])
+            return r
 
     def keyCount(self) :
         client = self._bollowRedis()
