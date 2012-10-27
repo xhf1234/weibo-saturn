@@ -57,7 +57,7 @@ class FriendsStore(AbsRedisStore):
     def __getKey(self, uid):
         return "wb:friendids:%d" % uid
 
-    def __extractId(key):
+    def __extractId(self, key):
         return int(key[13:])
 
     def __extractEmptyId(self, key):
