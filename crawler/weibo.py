@@ -13,9 +13,9 @@ class WeiboClient(object):
         rList = []
         while True:
             friends = self.__dumpFriends(uid, access_token, page)
+            rList.extend(friends)
             if len(friends) != self.pageSize:
                 break 
-            rList.extend(friends)
             page = page + 1
         return rList
 

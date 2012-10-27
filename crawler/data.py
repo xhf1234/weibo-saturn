@@ -32,6 +32,7 @@ class User(object):
         tDict = json.loads(strJson)
         tList = tDict["users"]
         userList = []
+        bb = True
         for v in tList:
             u = User.decodeFromDict(v)
             userList.append(u)
