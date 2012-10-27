@@ -15,7 +15,7 @@
         server.on('error', function (error) {
             console.error(error);
         });
-        server.listen(port, '127.0.0.1');
+        server.listen(port);
 
         require('./ctrl/MustacheController');
         require('./ctrl/WeiboController');
