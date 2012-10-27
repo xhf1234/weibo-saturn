@@ -7,15 +7,15 @@ import time
 import const
 import string
 
-def main(arg):
-    friendsStore = FriendsStore()
-    userStore = UserStore()
-    queue = Queue()
-    client = WeiboClient()
-    access_token = const.accessToken
+friendsStore = FriendsStore()
+userStore = UserStore()
+queue = Queue()
+client = WeiboClient()
+access_token = const.accessToken
 
+def run(uids):
+    global access_token
     print 'step1: get empty uids'
-    uids = friendsStore.filterUids(0)
     for uid in uids:
         try:
             print 'step2: dump friends, uid=%d' % uid
@@ -51,6 +51,12 @@ def main(arg):
         print 'friends.keyCount=%d' % friendsStore.keyCount()
         print '\n\n--------------------------------\n\n'
 
+def main(arg):
+    while (True):
+        uids = friendsStore.filterUids(0)
+        if len(uids)==0:
+            break
+        run(uids)
 
 if __name__ == '__main__':
     del sys.argv[0]
