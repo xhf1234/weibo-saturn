@@ -33,6 +33,21 @@ define(function (require, exports, module) {
         data.index = index;
     };
 
+    var randomSort = function (array) {
+        var size = array.length;
+        var t = null;
+        var rd = null;
+        while (size > 1) {
+            rd = Math.round(Math.random() * size);
+            if (rd < size) {
+                t = array[rd];
+                array[rd] = array[size - 1];
+                array[size - 1] = t;
+            }
+            size = size - 1;
+        }
+    };
+
     Arbor.addNode(user.uid, user);
     expand(user);
     Arbor.setClickCallback(function (user) {
@@ -42,6 +57,7 @@ define(function (require, exports, module) {
             $.getJSON('/weibo/expand', {
                 uid: user.uid
             }, function (friends) {
+                randomSort(friends);
                 cache.add(user.uid, friends);
                 expand(user);
             });

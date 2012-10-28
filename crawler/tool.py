@@ -13,7 +13,7 @@ queue = Queue()
 client = WeiboClient()
 access_token = const.accessToken
 
-def run(uids):
+def runFlterEmpty(uids):
     global access_token
     print 'step1: get empty uids'
     for uid in uids:
@@ -51,12 +51,37 @@ def run(uids):
         print 'friends.keyCount=%d' % friendsStore.keyCount()
         print '\n\n--------------------------------\n\n'
 
-def main(arg):
+def startFilterEmpty():
     while (True):
         uids = friendsStore.filterUids(0)
         if len(uids)==0:
             break
-        run(uids)
+        runFilterEmpty(uids)
+
+def startFilterName():
+    uids = userStore.uids()
+    users = userStore.getUsers(uids)
+    for user in users:
+        if user.name is None:
+            print user
+            break
+        if user.name == '':
+            user.name = str(user.uid)
+            userStore.saveUser(user)
+            continue
+        if len(user.name) < 2:
+            print user
+            break
+
+def main(arg):
+    if len(arg) == 0:
+        print 'need arguments'
+        exit(0)
+    cmd = arg[0]
+    if cmd == 'empty':
+        startFilterEmpty()
+    elif cmd == 'name':
+        startFilterName()
 
 if __name__ == '__main__':
     del sys.argv[0]

@@ -21,6 +21,14 @@ class UserStore(AbsRedisStore):
     def __getKey(self, uid):
         return self.__key_prefix + str(uid)
 
+    def __extractId(self, key):
+        return int(key[8:])
+
+    def uids(self):
+        client = self._bollowRedis()
+        keys = client.keys('wb:user:*')
+        return map(self.__extractId, keys)
+
     def saveUser(self, user):
         client = self._bollowRedis()
         pipe = client.pipeline()
@@ -43,6 +51,21 @@ class UserStore(AbsRedisStore):
         key = self.__getKey(uid)
         name = client.hget(key, UserStore.FIELD_NAME)
         return User(uid, name)
+
+    def getUsers(self, uids):
+        client = self._bollowRedis()
+        pipe = client.pipeline()
+        for uid in uids:
+            key = self.__getKey(uid)
+            name = pipe.hget(key, UserStore.FIELD_NAME)
+        names = pipe.execute()
+        rlist = []
+        for i in range(len(uids)):
+            uid = uids[i]
+            name = names[i]
+            user = User(uid, name)
+            rlist.append(user)
+        return rlist
 
     def count(self):
         client = self._bollowRedis()

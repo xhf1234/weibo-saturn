@@ -5,6 +5,15 @@
     "use strict";
     
     require('./Bootstrap').ready(function () {
-        require('./Store').getFriends(require('./Const').initUid);
+        var store = require('./Store');
+        store.getUsers(function (error, users) {
+            users.forEach(function (user) {
+                if (!user.name) {
+                    console.log('user = ' + user);
+                } else if (user.name.length < 2) {
+                    console.log('user = ' + user);
+                }
+            });
+        });
     });
 }());
