@@ -11,6 +11,30 @@ class AbsRedisStore(object):
     def _bollowRedis(self):
         return redis.StrictRedis(host=const.redisHost, port=6379, db=0)
 
+class NameIndexer(AbsRedisStore):
+    __key_prefix = 'wb:name:index:'
+
+    def __getKey(self, name):
+        return self.__key_prefix + name;
+
+    def setIndex(self, user):
+        client = self._bollowRedis()
+        key = self.__getKey(user.name)
+        client.set(key, user.uid)
+        
+    def setIndexPipe(self, users):
+        client = self._bollowRedis()
+        pipe = client.pipeline()
+        for user in users:
+            key = self.__getKey(user.name)
+            pipe.set(key, user.uid)
+        pipe.execute()
+
+    def getIndex(self, name):
+        client = self._bollowRedis()
+        key = self.__getKey(name)
+        return int(client.get(key))
+
 class UserStore(AbsRedisStore):
     
     FIELD_NAME = "name"
@@ -36,6 +60,9 @@ class UserStore(AbsRedisStore):
         pipe.hset(key, UserStore.FIELD_UID, user.uid)
         pipe.hset(key, UserStore.FIELD_NAME, user.name)
         pipe.execute()
+
+        indexer = NameIndexer()
+        indexer.setIndex(user)
 
     def saveUsers(self, users):
         client = self._bollowRedis()
