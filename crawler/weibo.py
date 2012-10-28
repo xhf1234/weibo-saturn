@@ -3,8 +3,6 @@
 import httplib
 from data import User
 
-
-
 class WeiboClient(object):
     pageSize = 200
 
@@ -27,6 +25,17 @@ class WeiboClient(object):
             raise ApiException(resp)
         strJson = resp.read()
         return User.decodeList(strJson) 
+
+    def getUserByName(self, name, access_token):
+        conn = httplib.HTTPSConnection("api.weibo.com")
+        conn.request("GET", "https://api.weibo.com/2/users/show.json?screen_name=%s&access_token=%s" %(name, access_token))
+        resp = conn.getresponse()
+        if resp.status == 400:
+            return None
+        if resp.status != 200:
+            raise ApiException(resp)
+        strJson = resp.read()
+        return User.decodeFromJson(strJson) 
 
 class ApiException(Exception):
     def __init__(self, resp):

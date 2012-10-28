@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from store import Queue, UserStore, FriendsStore
+from store import Queue, UserStore, FriendsStore, NameQueue
 from weibo import WeiboClient, ApiException
 from data import User
 import time
@@ -10,6 +10,7 @@ import string
 queue = Queue()
 userStore = UserStore()
 friendsStore = FriendsStore()
+nameQueue = NameQueue()
 client = WeiboClient()
 
 def main():
@@ -20,6 +21,28 @@ def main():
         queue.enqueue(initUid)
 
     while True:
+        print '*******check name queue********'
+        print 'step1: dequeue name'
+        name = nameQueue.dequeue()
+        if name is not None:
+            print 'step2: get user by name : %s' % name
+            try:
+                user = client.getUserByName(name, access_token)
+                if user is not None:
+                    print 'step3 save user : %s' % str(user)
+                    userStore.saveUser(user)
+                    print 'step4 put queue front, uid:%d' % user.uid
+                    queue.putFront(user.uid)
+            except ApiException, e:
+                print e
+                if e.status == 403:
+                    print "reload config"
+                    const.loadConfig()
+                    access_token = const.accessToken
+                nameQueue.enqueue(name)
+                time.sleep(60)
+                continue
+        print '*******check uid queue********'
         print 'step1: dequeue'
         uid = queue.dequeue()
         if uid is None:

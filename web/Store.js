@@ -104,5 +104,10 @@
         var client = getClient();
         client.zincrby('wb:queue', 10000, uid, callback);
     };
+    exports.enqueueName = function (name) {
+        var client = getClient();
+        client.rpush('wb:name:queue', name);
+    };
+
 
 }());

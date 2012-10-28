@@ -17,6 +17,8 @@ class User(object):
     @staticmethod
     def decodeFromDict(dictValue): 
         uid = dictValue[User.KEY_UID]
+        if not uid:
+            return None
         name = dictValue[User.KEY_NAME]
         if isinstance(name, unicode):
             name = name.encode("UTF-8")
