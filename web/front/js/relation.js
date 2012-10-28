@@ -18,21 +18,6 @@ define(function (require, exports, module) {
         };
         this[uid] = data;
     };
-    cache.add(user.uid, friends);
-    var expand = function (user) {
-        var data = cache[user.uid];
-        var friends = data.friends;
-        var index = data.index;
-        var friend = null;
-        while (index < friends.length && index - data.index < 5) {
-            friend = friends[index];
-            Arbor.addNode(friend.uid, friend);
-            Arbor.addEdge(user.uid, friend.uid);
-            index = index + 1;
-        }
-        data.index = index;
-    };
-
     var randomSort = function (array) {
         var size = array.length;
         var t = null;
@@ -46,6 +31,21 @@ define(function (require, exports, module) {
             }
             size = size - 1;
         }
+    };
+    randomSort(friends);
+    cache.add(user.uid, friends);
+    var expand = function (user) {
+        var data = cache[user.uid];
+        var friends = data.friends;
+        var index = data.index;
+        var friend = null;
+        while (index < friends.length && index - data.index < 5) {
+            friend = friends[index];
+            Arbor.addNode(friend.uid, friend);
+            Arbor.addEdge(user.uid, friend.uid);
+            index = index + 1;
+        }
+        data.index = index;
     };
 
     Arbor.addNode(user.uid, user);

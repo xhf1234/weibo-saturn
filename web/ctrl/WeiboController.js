@@ -84,7 +84,8 @@
                 resp.end(JSON.stringify(friends), 'utf-8');
             }
         });
-        
+        console.log('expand uid = ' + uid);
+        Store.putQueueFront(uid);
     };
 
     var ctrl = new WeiboController();
