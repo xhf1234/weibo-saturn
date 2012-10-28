@@ -14,6 +14,12 @@
         });
         return client;
     };
+    exports.getUid = function (name, callback) {
+        var client = getClient();
+        client.on("connect", function () {
+            client.get('wb:name:index:' + name, callback);
+        });
+    };
     exports.getUser = function (uid, callback) {
         if (!uid) {
             console.error('uid === null');

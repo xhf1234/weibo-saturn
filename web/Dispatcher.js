@@ -21,6 +21,9 @@
             return false;
         }, this);
         if (!handled) {
+            if (!path) {
+                path = 'index.html';
+            }
             var extname = require('path').extname(path);
             switch (extname) {
             case '':
