@@ -32,6 +32,7 @@ def runFlterEmpty(uids):
         if len(friendIds)==0:
             print 'empty friends, uid=%d' % uid
             print friends
+	    friendsStore.delEmpty(uid)
             continue
         print 'step2: del empty uid'
         friendsStore.delEmpty(uid)
