@@ -29,32 +29,44 @@
         });
     };
 
-    /* weibo */
-    var InitHandler = Handler.extend(null, 'GET');
-    InitHandler.prototype.handle = function (req, resp) {
-        var uid = require('../Const').initUid;
+    /* weibo/relation?name=$name */
+    var RelationHandler = Handler.extend('relation', 'GET');
+    RelationHandler.prototype.handle = function (req, resp) {
+        var params = require('../HttpUtils').getParams(req);
+        var name = params.name;
         var Store = require('../Store');
-        var path = require('path');
-        var tpl_base = path.normalize(__dirname + '/../front/html');
-        Store.getUser(uid, function (error, user) {
+        Store.getUid(name, function (error, uid) {
             if (error) {
                 onError(req, resp, error);
             } else {
-                var view = require('liteview');
-                view.init(tpl_base);
-                view.debug(true);
-                var data = {};
-                data.user = JSON.stringify(user);
-                Store.getFriends(uid, function (error, friends) {
-                    if (error) {
-                        onError(req, resp, error);
-                    } else {
-                        data.friends = JSON.stringify(friends);
-                        var html = view.render('weibo.html', data);
-                        resp.writeHead(200, { 'Content-Type': 'text/html'});
-                        resp.end(html, 'utf-8');
-                    }
-                });
+                var path = require('path');
+                var tpl_base = path.normalize(__dirname + '/../front/html/weibo');
+                if (uid) {
+                    Store.getUser(uid, function (error, user) {
+                        if (error) {
+                            onError(req, resp, error);
+                        } else {
+                            var view = require('liteview');
+                            view.init(tpl_base);
+                            view.debug(true);
+                            var data = {};
+                            data.user = JSON.stringify(user);
+                            Store.getFriends(uid, function (error, friends) {
+                                if (error) {
+                                    onError(req, resp, error);
+                                } else {
+                                    data.friends = JSON.stringify(friends);
+                                    var html = view.render('relation.html', data);
+                                    resp.writeHead(200, { 'Content-Type': 'text/html'});
+                                    resp.end(html, 'utf-8');
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    resp.writeHead(200);
+                    resp.end("User not found!", 'utf-8');
+                }
             }
         });
     };
@@ -77,7 +89,7 @@
 
     var ctrl = new WeiboController();
     ctrl.addHandler(new GetUserHandler());
-    ctrl.addHandler(new InitHandler());
+    ctrl.addHandler(new RelationHandler());
     ctrl.addHandler(new ExpandHandler());
     ctrl.init();
 }());

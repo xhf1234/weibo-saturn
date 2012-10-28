@@ -4,10 +4,12 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     </head>
 
-    <canvas id="viewport" width="1000" height="600"></canvas>
-
-    <script type="application/json" id="user">#{user}</script>
-    <script type="application/json" id="friends">#{friends}</script>
+    <div id="form-relation">
+        <h3>微博关系图</h3>
+        <span>微博昵称:</span>
+        <input class="nick-name"/>
+        <input type="button" class="btn-submit" value="GO"></input>
+    </div>
 
     <script type="text/javascript" src="vendor/sea.js"></script>
     <script type="text/javascript" src="vendor/mustache.js"></script>
@@ -17,6 +19,6 @@
     <script type="text/javascript" src="vendor/backbone.js"></script>
     <script type="text/javascript" src="vendor/arbor.js"></script>
     <script type="text/javascript">
-        seajs.use(['/weibo']);
+        seajs.use(['/index']);
     </script>
 </html>

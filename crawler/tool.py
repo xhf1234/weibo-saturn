@@ -91,6 +91,8 @@ def main(arg):
         startFilterName()
     elif cmd == 'index':
         startIndex()
+    elif cmd == 'getIndex':
+        print indexer.getIndex(arg[1])
 
 if __name__ == '__main__':
     del sys.argv[0]
