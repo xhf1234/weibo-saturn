@@ -22,6 +22,7 @@
         var client = getClient();
         client.on("connect", function () {
             client.hget('wb:user:' + uid, 'name', function (error, result) {
+                client.end();
                 if (error) {
                     callback(error, null);
                 } else {
@@ -31,19 +32,56 @@
             });
         });
     };
+    exports.getUsers = function (callback) {
+        var client = getClient();
+        client.on("connect", function () {
+            client.keys('wb:user:*', function (error, keys) {
+                client.end();
+                client = getClient();
+                var multi = client.multi();
+                keys = keys.filter(function (key) {
+                    return key;
+                });
+                keys.forEach(function (key) {
+                    multi.hget(key, 'name');
+                });
+                multi.exec(function (error, names) {
+                    client.end();
+                    var users = [];
+                    var i, uid, name, user, key;
+                    for (i = 0; i < keys.length; i = i + 1) {
+                        key = keys[i];
+                        uid = parseInt(key.substr(8), 10);
+                        name = names[i];
+                        if (!name) {
+                            name = uid.toString();
+                        }
+                        user = new User(uid, name);
+                        users.push(user);
+                    }
+                    callback(null, users);
+                });
+            });
+        });
+    };
+
+
     exports.getFriends = function (uid, callback) {
         var client = getClient();
         client.on("connect", function () {
             client.smembers('wb:friendids:' + uid, function (error, result) {
+                client.end();
                 if (error) {
                     callback(error, null);
                 } else {
                     var friendIds = result;
+                    client = getClient();
                     var multi = client.multi();
                     friendIds.forEach(function (friendId) {
                         multi.hget('wb:user:' + friendId, 'name');
                     });
                     multi.exec(function (error, names) {
+                        client.end();
                         var results = [];
                         var i = 0;
                         while (i < friendIds.length) {

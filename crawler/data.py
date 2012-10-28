@@ -20,6 +20,8 @@ class User(object):
         name = dictValue[User.KEY_NAME]
         if isinstance(name, unicode):
             name = name.encode("UTF-8")
+        if name == '':
+            name = str(uid)
         return User(uid, name)
 
     @staticmethod

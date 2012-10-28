@@ -8,5 +8,8 @@
         this.uid = uid;
         this.name = name;
     };
+    User.prototype.toString = function () {
+        return 'uid:' + this.uid + ', name:' + this.name;
+    };
     exports.User = User;
 }());
