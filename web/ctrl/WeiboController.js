@@ -63,7 +63,9 @@
                             });
                         }
                     });
+                    Store.putQueueFront(uid);
                 } else {
+                    Store.enqueueName(name);
                     resp.writeHead(200);
                     resp.end("User not found!", 'utf-8');
                 }

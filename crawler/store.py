@@ -200,6 +200,17 @@ class FriendsStore(AbsRedisStore):
         keys = client.keys('wb:friendids:*')
         emptyKeys = client.keys('wb:empty:friendids:*')
         return len(keys) + len(emptyKeys)
+        
+class NameQueue(AbsRedisStore):
+    __key = "wb:name:queue"
+
+    def enqueue(self, name):
+        client = self._bollowRedis()
+        client.rpush(self.__key, name)
+
+    def dequeue(self):
+        client = self._bollowRedis()
+        return client.lpop(self.__key)
 
 class Queue(AbsRedisStore):
     __key = "wb:queue"
@@ -226,7 +237,7 @@ class Queue(AbsRedisStore):
 
     def putFront(self, uid):
         client = self._bollowRedis()
-        client.azdd(self.__key, uid, 10000)
+        client.zadd(self.__key, 10000, uid)
 
     def count(self):
         client = self._bollowRedis()
