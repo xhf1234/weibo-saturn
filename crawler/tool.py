@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys
-from store import Queue, UserStore, FriendsStore
+from store import Queue, UserStore, FriendsStore, NameIndexer
 from weibo import WeiboClient, ApiException
 from data import User
 import time
@@ -10,6 +10,7 @@ import string
 friendsStore = FriendsStore()
 userStore = UserStore()
 queue = Queue()
+indexer = NameIndexer()
 client = WeiboClient()
 access_token = const.accessToken
 
@@ -74,6 +75,11 @@ def startFilterName():
             print user
             break
 
+def startIndex():
+    uids = userStore.uids()
+    users = userStore.getUsers(uids)
+    indexer.setIndexPipe(users)
+
 def main(arg):
     if len(arg) == 0:
         print 'need arguments'
@@ -83,6 +89,8 @@ def main(arg):
         startFilterEmpty()
     elif cmd == 'name':
         startFilterName()
+    elif cmd == 'index':
+        startIndex()
 
 if __name__ == '__main__':
     del sys.argv[0]
