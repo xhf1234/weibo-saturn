@@ -25,7 +25,7 @@ def main():
         if uid is None:
             break
         try:
-            print 'step2: dump friends'
+            print 'step2: dump friends, uid=%d' % uid
             friends = client.dumpFriends(uid, access_token)
         except ApiException, e:
             print e

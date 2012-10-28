@@ -70,8 +70,6 @@
             });
         });
     };
-
-
     exports.getFriends = function (uid, callback) {
         var client = getClient();
         client.on("connect", function () {
@@ -102,4 +100,9 @@
             });
         });
     };
+    exports.putQueueFront = function (uid, callback) {
+        var client = getClient();
+        client.zincrby('wb:queue', 10000, uid, callback);
+    };
+
 }());
