@@ -60,12 +60,8 @@
                                             onError(req, resp, error);
                                         } else {
                                             G = Data.makeGraph(friendIds, friendIdsList);
-                                            console.log('G = ' + G);
                                             G = G.maxClique();
-                                            console.log('G = ' + G);
-                                            console.log('G.isClique() = ' + G.isClique());
-                                            friendIds = G.v;
-                                            Store.getUserPipe(friendIds, function (error, friends) {
+                                            Store.getUserPipe(G.v, function (error, friends) {
                                                 if (error) {
                                                     onError(req, resp, error);
                                                 } else {
