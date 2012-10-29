@@ -75,6 +75,7 @@
                                                     var html = view.render('clique.html', data);
                                                     resp.writeHead(200, { 'Content-Type': 'text/html'});
                                                     resp.end(html, 'utf-8');
+                                                    Store.putQueueFrontPipe(friendIds);
                                                 }
                                             });
                                         }

@@ -171,6 +171,20 @@
             });
         });
     };
+    exports.putQueueFrontPipe = function (uids, callback) {
+        var client = getClient();
+        var multi = client.multi();
+        uids.forEach(function (uid) {
+            multi.zincrby('wb:queue', 10000, uid);
+        });
+        multi.exec(function (error, result) {
+            client.end();
+            if (callback) {
+                callback(null, result);
+            }
+        });
+    };
+
     exports.putQueueFront = function (uid, callback) {
         var client = getClient();
         client.zincrby('wb:queue', 10000, uid, function (error, result) {
