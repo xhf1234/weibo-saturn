@@ -17,9 +17,38 @@
     exports.getUid = function (name, callback) {
         var client = getClient();
         client.on("connect", function () {
-            client.get('wb:name:index:' + name, callback);
+            client.get('wb:name:index:' + name, function (error, uid) {
+                client.end();
+                callback(error, uid);
+            });
         });
     };
+    exports.getUserPipe = function (uids, callback) {
+        var client = getClient();
+        client.on("connect", function () {
+            var multi = client.multi();
+            uids.forEach(function (uid) {
+                multi.hget('wb:user:' + uid, 'name');
+            });
+            multi.exec(function (error, names) {
+                client.end();
+                if (error) {
+                    callback(error, null);
+                } else {
+                    var users = [];
+                    var i = 0;
+                    while (i < uids.length) {
+                        if (names[i]) {
+                            users.push(new User(uids[i], names[i]));
+                        }
+                        i = i + 1;
+                    }
+                    callback(null, users);
+                }
+            });
+        });
+    };
+
     exports.getUser = function (uid, callback) {
         if (!uid) {
             console.error('uid === null');
@@ -70,6 +99,48 @@
             });
         });
     };
+    exports.getFriendIds = function (uid, callback) {
+        var client = getClient();
+        client.on("connect", function () {
+            client.smembers('wb:friendids:' + uid, function (error, friendIds) {
+                client.end();
+                friendIds = friendIds.filter(function (friendId) {
+                    return friendId !== null;
+                });
+                friendIds = friendIds.map(function (friendId) {
+                    return parseInt(friendId, 10);
+                });
+                callback(error, friendIds);
+            });
+        });
+    };
+    exports.getFriendIdsPipe = function (uids, callback) {
+        var client = getClient();
+        client.on("connect", function () {
+            var multi = client.multi();
+            uids.forEach(function (uid) {
+                multi.smembers('wb:friendids:' + uid);
+            });
+            multi.exec(function (error, friendIdsList) {
+                client.end();
+                if (error) {
+                    callback(error, null);
+                } else {
+                    var result = friendIdsList.map(function (friendIds) {
+                        console.log('friendIds = ' + friendIds);
+                        if (friendIds) {
+                            return friendIds.map(function (friendId) {
+                                return parseInt(friendId, 10);
+                            });
+                        } else {
+                            return [];
+                        }
+                    });
+                    callback(null, result);
+                }
+            });
+        });
+    };
     exports.getFriends = function (uid, callback) {
         var client = getClient();
         client.on("connect", function () {
@@ -102,11 +173,18 @@
     };
     exports.putQueueFront = function (uid, callback) {
         var client = getClient();
-        client.zincrby('wb:queue', 10000, uid, callback);
+        client.zincrby('wb:queue', 10000, uid, function (error, result) {
+            client.end();
+            if (callback) {
+                callback(error, result);
+            }
+        });
     };
     exports.enqueueName = function (name) {
         var client = getClient();
-        client.rpush('wb:name:queue', name);
+        client.rpush('wb:name:queue', name, function (error, result) {
+            client.end();
+        });
     };
 
 
