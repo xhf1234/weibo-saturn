@@ -6,7 +6,10 @@ define(function (require, exports, module) {
 
     var $ = window.jQuery.noConflict();
     var RelationForm = require('/view/RelationForm');
+    var CliqueForm = require('/view/CliqueForm');
 
     var relationForm = new RelationForm();
+    var cliqueForm = new CliqueForm();
+
     relationForm.$('input.nick-name').focus();
 });
