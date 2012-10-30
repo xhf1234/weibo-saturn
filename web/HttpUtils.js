@@ -35,6 +35,10 @@
         serveFile(req, resp, 'front/less/' + file, 'text/css');
     };
 
+    exports.serveCss = function (req, resp, file) {
+        serveFile(req, resp, 'front/css/' + file, 'text/css');
+    };
+
     exports.serveJs = function (req, resp, file) {
         serveFile(req, resp, 'front/js/' + file, 'text/javascript');
     };

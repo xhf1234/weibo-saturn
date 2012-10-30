@@ -42,6 +42,10 @@
                 require('./HttpUtils').serveLess(req, resp, path);
                 handled = true;
                 break;
+            case '.css':
+                require('./HttpUtils').serveCss(req, resp, path);
+                handled = true;
+                break;
             }
         }
         if (!handled) {
