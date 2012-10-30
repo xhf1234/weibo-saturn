@@ -7,13 +7,12 @@
     require('./Bootstrap').ready(function () {
         var Data = require('./data');
         var Graph = Data.Graph;
-        var friendIds = [1, 2, 3, 4];
-        var friendIdsList = [[2], [4], [1], [1]];
-        var G = Data.makeGraph(friendIds, friendIdsList);
+        var Edge = Data.Edge;
+        var a = [1, 2, 3, 4, 5, 6];
+        var b = [[2, 5], [3, 4,  5], [4, 5], [5, 6], [], []];
+        var G = Data.makeGraph(a, b);
         console.log('G = ' + G);
-        console.log('Utils.isClique(G) = ' + G.isClique());
-        var G2 = G.maxClique();
-        console.log('G2 = ' + G2);
-        console.log('Utils.isClique(G2) = ' + G2.isClique());
+        G = G.maxClique();
+        console.log('G = ' + G);
     });
 }());
