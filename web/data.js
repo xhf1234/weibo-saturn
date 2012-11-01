@@ -138,13 +138,11 @@
     Graph.prototype.isClique = function () {
         return this.v.every(function (u) {
             return this.v.every(function (v) {
-                var edge = null;
-                if (u === v) {
-                    return true;
-                } else {
-                    edge = new Edge(u, v);
+                if (u !== v) {
+                    var edge = new Edge(u, v);
                     return this.containsEdge(edge);
                 }
+                return true;
             }, this);
         }, this);
     };
@@ -280,7 +278,7 @@
     };
     Graph.prototype.maxClique2 = function () {
         var size = this.v.length;
-        var i = size;
+        var i = 1;
         var c = null;
         var t = null;
         var j = null;
@@ -288,11 +286,13 @@
         var GG = null;
         var flag = null;
         var toRemove = null;
+        var max = null;
+        var findMax = false;
 
         var removeVertex = function (v) {
             this.removeVertex(v);
         };
-        while (i > 0) {
+        while (i < size) {
             c = size - i;
             t = [];
             for (j = 0; j < i; j = j + 1) {
@@ -301,6 +301,7 @@
             for (j = 0; j < c; j = j + 1) {
                 t.push(false);
             }
+            findMax = false;
             while (true) {
                 GG = this.clone();
                 toRemove = [];
@@ -311,7 +312,9 @@
                 }
                 toRemove.forEach(removeVertex, GG);
                 if (GG.isClique()) {
-                    return GG;
+                    max = GG;
+                    findMax = true;
+                    break;
                 }
                 flag = false;
                 for (j = 1; j < size; j += 1) {
@@ -342,7 +345,10 @@
                     break;
                 }
             }
-            i = i - 1;
+            if (!findMax) {
+                return max;
+            }
+            i = i + 1;
         }
         return this;
     };
