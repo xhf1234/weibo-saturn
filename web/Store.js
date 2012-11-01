@@ -127,8 +127,11 @@
                     callback(error, null);
                 } else {
                     var result = friendIdsList.map(function (friendIds) {
-                        console.log('friendIds = ' + friendIds);
-                        if (friendIds) {
+                        var b = friendIds instanceof Array;
+                        if (!b) {
+                            console.log('not array, friendIds = ' + friendIds);
+                        }
+                        if (friendIds && b) {
                             return friendIds.map(function (friendId) {
                                 return parseInt(friendId, 10);
                             });
