@@ -34,6 +34,7 @@
     CliqueHandler.prototype.handle = function (req, resp) {
         var params = require('../HttpUtils').getParams(req);
         var name = params.name;
+        var flag = params.flag;
         var Store = require('../Store');
         Store.getUid(name, function (error, uid) {
             if (error) {
@@ -60,7 +61,11 @@
                                             onError(req, resp, error);
                                         } else {
                                             G = Data.makeGraph(friendIds, friendIdsList);
-                                            G = G.maxClique();
+                                            if (flag) {
+                                                G = G.maxClique2();
+                                            } else {
+                                                G = G.maxClique();
+                                            }
                                             Store.getUserPipe(G.v, function (error, friends) {
                                                 if (error) {
                                                     onError(req, resp, error);

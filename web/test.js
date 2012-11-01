@@ -12,7 +12,7 @@
         var b = [[2, 5], [3, 4,  5], [4, 5], [5, 6], [], []];
         var G = Data.makeGraph(a, b);
         console.log('G = ' + G);
-        G = G.maxClique();
+        G = G.maxClique2();
         console.log('G = ' + G);
     });
 }());

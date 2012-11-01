@@ -151,7 +151,7 @@
     Graph.prototype.removeVertex = function (v) {
         var index = this.v.indexOf(v);
         if (index !== -1) {
-            this.v = this.v.splice(index, 1);
+            this.v.splice(index, 1);
             this.e.splice(index, 1);
             this.e.forEach(function (es) {
                 es.splice(index, 1);
@@ -313,25 +313,33 @@
                 if (GG.isClique()) {
                     return GG;
                 }
-                flag = true;
-                for (j = c - 1; j >= 0; j = j - 1) {
-                    if (t[j]) {
-                        flag = false;
+                flag = false;
+                for (j = 1; j < size; j += 1) {
+                    if (!t[j] && t[j - 1]) {
+                        flag = true;
+                        t[j] = true;
+                        t[j - 1] = false;
+                        j = j - 2;
+                        k = 0;
+                        while (j > k) {
+                            while (j > k && !t[j]) {
+                                j -= 1;
+                            }
+                            while (j > k && t[k]) {
+                                k += 1;
+                            }
+                            if (j > k) {
+                                t[j] = false;
+                                t[k] = true;
+                                j -= 1;
+                                k += 1;
+                            }
+                        }
+                        break;
                     }
                 }
-                if (flag) {
+                if (!flag) {
                     break;
-                } else {
-                    j = size - 1;
-                    while (t[j]) {
-                        j = j - 1;
-                    }
-                    k = j - 1;
-                    while (!t[k]) {
-                        k = k - 1;
-                    }
-                    t[j] = true;
-                    t[k] = false;
                 }
             }
             i = i - 1;
