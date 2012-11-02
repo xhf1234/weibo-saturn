@@ -55,12 +55,12 @@
                                     onError(req, resp, error);
                                 } else {
                                     Store.getFriendIdsPipe(friendIds, function (error, friendIdsList) {
-                                        var Data = require('../data');
+                                        var Graph = require('../data/Graph');
                                         var G = null;
                                         if (error) {
                                             onError(req, resp, error);
                                         } else {
-                                            G = Data.makeGraph(friendIds, friendIdsList);
+                                            G = Graph.makeGraph(friendIds, friendIdsList);
                                             if (flag) {
                                                 G = G.maxClique2();
                                             } else {
@@ -155,10 +155,77 @@
         Store.putQueueFront(uid);
     };
 
+    var PathHandler = Handler.extend('path', 'GET');
+    PathHandler.prototype.handle = function (req, resp) {
+        var params = require('../HttpUtils').getParams(req);
+        var srcName = params.src;
+        var dstName = params.dst;
+        var Store = require('../Store');
+        Store.getUid(srcName, function (error, srcUid) {
+            if (error) {
+                onError(req, resp, error);
+            } else {
+                if (srcUid) {
+                    Store.getUid(dstName, function (error, dstUid) {
+                        if (error) {
+                            onError(req, resp, error);
+                        } else {
+                            if (dstUid) {
+                                console.log('srcUid = ' + srcUid);
+                                console.log('dstUid = ' + dstUid);
+                                var BFS = require('../algorithm/BFS');
+                                BFS.BFS(srcUid, dstUid, Store.getFriendIds, function (error, path) {
+                                    if (error) {
+                                        onError(req, resp, error);
+                                    } else {
+                                        if (path) {
+                                            Store.getUserPipe(path, function (error, users) {
+                                                if (error) {
+                                                    onError(req, resp, error);
+                                                } else {
+                                                    var view = require('liteview');
+                                                    var path = require('path');
+                                                    var tpl_base = path.normalize(__dirname + '/../front/html/weibo');
+                                                    view.init(tpl_base);
+                                                    view.debug(true);
+
+                                                    var data = {};
+                                                    data.users = JSON.stringify(users);
+                                                    console.log('data.users = ' + data.users);
+                                                    var html = view.render('path.html', data);
+                                                    resp.writeHead(200, { 'Content-Type': 'text/html'});
+                                                    resp.end(html, 'utf-8');
+                                                }
+                                            });
+                                        } else {
+                                            resp.writeHead(200);
+                                            resp.end("path not exists!", 'utf-8');
+                                        }
+                                    }
+                                });
+                                Store.putQueueFront(dstUid);
+                            } else {
+                                Store.enqueueName(dstName);
+                                resp.writeHead(200);
+                                resp.end("User not found! " + dstName, 'utf-8');
+                            }
+                        }
+                    });
+                    Store.putQueueFront(srcUid);
+                } else {
+                    Store.enqueueName(srcName);
+                    resp.writeHead(200);
+                    resp.end("User not found! " + srcName, 'utf-8');
+                }
+            }
+        });
+    };
+
     var ctrl = new WeiboController();
     ctrl.addHandler(new GetUserHandler());
     ctrl.addHandler(new RelationHandler());
     ctrl.addHandler(new CliqueHandler());
     ctrl.addHandler(new ExpandHandler());
+    ctrl.addHandler(new PathHandler());
     ctrl.init();
 }());

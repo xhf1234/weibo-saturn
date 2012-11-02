@@ -4,205 +4,95 @@
 (function () {
     "use strict";
 
-    var User = require('./data').User;
-    var redisHost = require('./Const').redisHost;
-    var getClient = function () {
-        var redis = require('redis');
-        var client = redis.createClient(6379, redisHost);
-        client.on('error', function (error) {
-            console.error(error);
-        });
-        return client;
-    };
-    exports.getUid = function (name, callback) {
-        var client = getClient();
-        client.on("connect", function () {
-            client.get('wb:name:index:' + name, function (error, uid) {
-                client.end();
-                callback(error, uid);
-            });
-        });
-    };
-    exports.getUserPipe = function (uids, callback) {
-        var client = getClient();
-        client.on("connect", function () {
-            var multi = client.multi();
-            uids.forEach(function (uid) {
-                multi.hget('wb:user:' + uid, 'name');
-            });
-            multi.exec(function (error, names) {
-                client.end();
-                if (error) {
-                    callback(error, null);
-                } else {
-                    var users = [];
-                    var i = 0;
-                    while (i < uids.length) {
-                        if (names[i]) {
-                            users.push(new User(uids[i], names[i]));
-                        }
-                        i = i + 1;
-                    }
-                    callback(null, users);
-                }
-            });
-        });
-    };
+    var UserStore = require('./store/UserStore');
+    var userStore = new UserStore();
+    var NameIndexer = require('./store/NameIndexer');
+    var nameIndexer = new NameIndexer();
+    var FriendsStore = require('./store/FriendsStore');
+    var friendsStore = new FriendsStore();
+    var Queue = require('./store/Queue');
+    var queue = new Queue();
+    var NameQueue = require('./store/NameQueue');
+    var nameQueue = new NameQueue();
 
-    exports.getUser = function (uid, callback) {
-        if (!uid) {
-            console.error('uid === null');
-            return null;
-        }
-        var client = getClient();
-        client.on("connect", function () {
-            client.hget('wb:user:' + uid, 'name', function (error, result) {
-                client.end();
-                if (error) {
-                    callback(error, null);
-                } else {
-                    var user = new User(uid, result);
-                    callback(null, user);
-                }
-            });
-        });
-    };
-    exports.getUsers = function (callback) {
-        var client = getClient();
-        client.on("connect", function () {
-            client.keys('wb:user:*', function (error, keys) {
-                client.end();
-                client = getClient();
-                var multi = client.multi();
-                keys = keys.filter(function (key) {
-                    return key;
-                });
-                keys.forEach(function (key) {
-                    multi.hget(key, 'name');
-                });
-                multi.exec(function (error, names) {
-                    client.end();
-                    var users = [];
-                    var i, uid, name, user, key;
-                    for (i = 0; i < keys.length; i = i + 1) {
-                        key = keys[i];
-                        uid = parseInt(key.substr(8), 10);
-                        name = names[i];
-                        if (!name) {
-                            name = uid.toString();
-                        }
-                        user = new User(uid, name);
-                        users.push(user);
-                    }
-                    callback(null, users);
-                });
-            });
-        });
-    };
-    exports.getFriendIds = function (uid, callback) {
-        var client = getClient();
-        client.on("connect", function () {
-            client.smembers('wb:friendids:' + uid, function (error, friendIds) {
-                client.end();
-                friendIds = friendIds.filter(function (friendId) {
-                    return friendId !== null;
-                });
-                friendIds = friendIds.map(function (friendId) {
-                    return parseInt(friendId, 10);
-                });
-                callback(error, friendIds);
-            });
-        });
-    };
-    exports.getFriendIdsPipe = function (uids, callback) {
-        var client = getClient();
-        client.on("connect", function () {
-            var multi = client.multi();
-            uids.forEach(function (uid) {
-                multi.smembers('wb:friendids:' + uid);
-            });
-            multi.exec(function (error, friendIdsList) {
-                client.end();
-                if (error) {
-                    callback(error, null);
-                } else {
-                    var result = friendIdsList.map(function (friendIds) {
-                        var b = friendIds instanceof Array;
-                        if (!b) {
-                            console.log('not array, friendIds = ' + friendIds);
-                        }
-                        if (friendIds && b) {
-                            return friendIds.map(function (friendId) {
-                                return parseInt(friendId, 10);
-                            });
-                        } else {
-                            return [];
-                        }
-                    });
-                    callback(null, result);
-                }
-            });
-        });
-    };
+    /* 
+     * get user id by name
+     * param [String name]
+     * param callback(error, uid)
+     *
+     */
+    exports.getUid = nameIndexer.getUid.bind(nameIndexer);
+
+    /*
+     * get user by user id
+     * param [Number uid]
+     * param callback(error, user)
+     *
+     */
+    exports.getUser = userStore.getUser.bind(userStore);
+
+    /*
+     * get users in a pipeline way.
+     * param [Array uids]
+     * param callback(error, users)
+     */
+    exports.getUserPipe = userStore.getUserPipe.bind(userStore);
+
+    /*
+     * get all users
+     *
+     */
+    exports.getAllUsers = userStore.getAllUsers.bind(userStore);
+    
+    /*
+     * get friendIds
+     * param [Number, uid]
+     * callback(error, friendIds)
+     */
+    exports.getFriendIds = friendsStore.getFriendIds.bind(friendsStore);
+
+    /*
+     * get friend ids array in a pipeline way
+     * params [Array uids]
+     * callback(error, [[friendIds], [friendIds], ...]
+     */
+    exports.getFriendIdsPipe = friendsStore.getFriendIdsPipe.bind(friendsStore);
+
+    /*
+     * get friends
+     * param [Number uid]
+     * callback(error, users)
+     */
     exports.getFriends = function (uid, callback) {
-        var client = getClient();
-        client.on("connect", function () {
-            client.smembers('wb:friendids:' + uid, function (error, result) {
-                client.end();
-                if (error) {
-                    callback(error, null);
-                } else {
-                    var friendIds = result;
-                    client = getClient();
-                    var multi = client.multi();
-                    friendIds.forEach(function (friendId) {
-                        multi.hget('wb:user:' + friendId, 'name');
-                    });
-                    multi.exec(function (error, names) {
-                        client.end();
-                        var results = [];
-                        var i = 0;
-                        while (i < friendIds.length) {
-                            if (names[i]) {
-                                results.push(new User(friendIds[i], names[i]));
-                            }
-                            i = i + 1;
-                        }
-                        callback(null, results);
-                    });
-                }
-            });
-        });
-    };
-    exports.putQueueFrontPipe = function (uids, callback) {
-        var client = getClient();
-        var multi = client.multi();
-        uids.forEach(function (uid) {
-            multi.zincrby('wb:queue', 10000, uid);
-        });
-        multi.exec(function (error, result) {
-            client.end();
-            if (callback) {
-                callback(null, result);
+        friendsStore.getFriendIds(uid, function (error, friendIds) {
+            if (error) {
+                callback(error, null);
+            } else {
+                userStore.getUserPipe(friendIds, function (error, users) {
+                    callback(error, users);
+                });
             }
         });
     };
 
-    exports.putQueueFront = function (uid, callback) {
-        var client = getClient();
-        client.zincrby('wb:queue', 10000, uid, function (error, result) {
-            client.end();
-            if (callback) {
-                callback(error, result);
-            }
-        });
-    };
-    exports.enqueueName = function (name) {
-        var client = getClient();
-        client.rpush('wb:name:queue', name, function (error, result) {
-            client.end();
-        });
-    };
+    /*
+     * put the uid in front of the queue
+     * param [Number uids]
+     * param callback(error)
+     */
+    exports.putQueueFront = queue.putQueueFront.bind(queue);
 
+    /*
+     * put the uids in front of the queue
+     * param [Array uids]
+     * param callback(error)
+     */
+    exports.putQueueFrontPipe = queue.putQueueFrontPipe.bind(queue);
 
+    /*
+     * enqueue the name
+     * param [String name]
+     * param callback(error)
+     */
+    exports.enqueueName = nameQueue.enqueueName.bind(nameQueue);
 }());

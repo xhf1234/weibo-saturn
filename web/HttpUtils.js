@@ -14,7 +14,6 @@
 
     var serveFile = function (req, resp, file, type) {
         file = __dirname + '/' + file;
-        console.log('serveFile ' + file + ',' + type);
         require('fs').readFile(file, function (error, content) {
             if (error) {
                 console.error(error);

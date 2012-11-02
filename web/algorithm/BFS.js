@@ -82,5 +82,5 @@
             innerBFS(context, adj, callback);
         }
     };
-    exports.BFS = BFS;
+    module.exports = BFS;
 }());
