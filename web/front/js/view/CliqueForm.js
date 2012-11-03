@@ -7,7 +7,7 @@ define(function (require, exports, module) {
     var Backbone = window.Backbone;
 
     var Form = Backbone.View.extend({
-        el: 'div#form-clique',
+        el: 'form#form-clique',
 
         events: {
             'click .btn-submit': 'onSubmit'
@@ -22,7 +22,8 @@ define(function (require, exports, module) {
             });
         },
 
-        onSubmit: function () {
+        onSubmit: function (evt) {
+            evt.preventDefault();
             var name = this.$('.nick-name').val();
             if (!name) {
                 alert('请输入昵称');
