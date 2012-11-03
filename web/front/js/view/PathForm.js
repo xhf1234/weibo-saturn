@@ -7,7 +7,7 @@ define(function (require, exports, module) {
     var Backbone = window.Backbone;
 
     var Form = Backbone.View.extend({
-        el: 'form#form-clique',
+        el: 'div#form-path',
 
         events: {
             'click .btn-submit': 'onSubmit'
@@ -17,18 +17,22 @@ define(function (require, exports, module) {
             var form = this;
             this.$('.nick-name').keyup(function (e) {
                 if (e.which === 13) {
-                    form.onSubmit();
+                    form.$('.btn-submit').click();
                 }
             });
         },
 
-        onSubmit: function (evt) {
-            evt.preventDefault();
-            var name = this.$('.nick-name').val();
-            if (!name) {
-                alert('请输入昵称');
+        onSubmit: function () {
+            var srcName = this.$('.src-name').val();
+            var dstName = this.$('.dst-name').val();
+            if (!srcName) {
+                alert('请输入源用户昵称');
             } else {
-                window.location = 'weibo/clique?name=' + name;
+                if (!dstName) {
+                    alert('请输入目的用户昵称');
+                } else {
+                    window.location = 'weibo/path?src=' + srcName + '&dst=' + dstName;
+                }
             }
         }
     });

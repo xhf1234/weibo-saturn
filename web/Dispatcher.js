@@ -11,7 +11,7 @@
 
     exports.dispatch = function (req, resp) {
         var path = require('./HttpUtils').getPath(req);
-        console.log('dispatch path=' + path);
+        console.log('path = ' + path);
 
         var handled = controllers.some(function (controller) {
             if (controller.match(path, req.method)) {
