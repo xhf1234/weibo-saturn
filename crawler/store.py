@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#coding=UTF-8
 
 import redis
 from weibo import WeiboClient
@@ -382,6 +383,7 @@ if __name__ == '__main__':
     uids = teacherStore.uids()
     teachers = teacherStore.getTeachers(uids)
     for teacher in teachers:
-        print teacher.verify
+        if '主持人' in teacher.verify:
+            print teacher.verify
 
 

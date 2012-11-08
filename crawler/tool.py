@@ -88,10 +88,11 @@ def filterTeachers():
     toDelete = []
     for teacher in teachers:
         verify = teacher.verify
-        if '主持人' not in verify:
+        if '主持人' in verify:
             print verify
+        else:
             toDelete.append(teacher.uid)
-    teacherStore.deletePipe(uids)
+    teacherStore.deletePipe(toDelete)
     print teacherStore.count()
 
 def main(arg):
