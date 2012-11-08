@@ -64,7 +64,8 @@ def main():
                 print "reload config"
                 const.loadConfig()
                 access_token = const.accessToken
-            queue.putFront(uid)
+            if e.status != 400:
+                queue.putFront(uid)
             time.sleep(60)
             continue
 
