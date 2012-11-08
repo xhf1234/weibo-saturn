@@ -363,14 +363,25 @@ class FlagSet(AbsRedisStore):
         key = self._getKey(type, id)
         return client.exists(key)
 
+    def clear(self):
+        client = self._bollowRedis()
+        keys = client.keys(self._key_prefix + '*')
+        pipe = client.pipeline()
+        for key in keys:
+            pipe.delete(key)
+        pipe.execute()
+
 if __name__ == '__main__':
     userStore = UserStore()
     teacherStore = TeacherStore()
     friendsStore = FriendsStore()
     queue = Queue()
+    flagSet = FlagSet()
 
     print teacherStore.count()
     uids = teacherStore.uids()
     teachers = teacherStore.getTeachers(uids)
     for teacher in teachers:
         print teacher.verify
+
+
