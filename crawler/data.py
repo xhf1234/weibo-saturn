@@ -69,10 +69,7 @@ class Teacher(object):
         dictValue = json.loads(jsonValue)
         if dictValue['verified'] is False:
             return None
-        teacher = Teacher.decodeFromDict(dictValue)
-        if '主持人' in teacher.verify:
-            return teacher
-        return None
+        return = Teacher.decodeFromDict(dictValue)
 
     @staticmethod
     def decodeFromDict(dictValue): 
@@ -94,7 +91,7 @@ class Teacher(object):
             avatar = avatar.encode("UTF-8")
         if isinstance(url, unicode):
             url = url.encode("UTF-8")
-        teacher = Teacher.decodeFromDict(dictValue)
+        teacher = Teacher(uid, name, verify, fansCount, avatar, url)
         if '主持人' in teacher.verify:
             return teacher
         return None
