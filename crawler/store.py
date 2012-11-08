@@ -264,7 +264,7 @@ class TeacherStore(AbsRedisStore):
 
     def uids(self):
         client = self._bollowRedis()
-        keys = client.keys('wb:teacher:*')
+        keys = client.keys(self._key_prefix + '*')
         return map(self.__extractId, keys)
 
     def saveTeacher(self, teacher):
@@ -301,6 +301,51 @@ class TeacherStore(AbsRedisStore):
         keys = client.keys(self._key_prefix + "*")
         return len(keys)
 
+    def uids(self):
+        client = self._bollowRedis()
+        keys = client.keys(self._key_prefix + '*')
+        return map(self.__extractId, keys)
+
+    def delete(self, uid):
+        client = self._bollowRedis()
+        key = self.__getKey(uid)
+        client.delete(key)
+
+    def deletePipe(self, uids):
+        client = self._bollowRedis()
+        pipe = client.pipeline()
+        for uid in uids:
+            key = self.__getKey(uid)
+            pipe.delete(key)
+        pipe.execute()
+
+    def getTeachers(self, uids):
+        client = self._bollowRedis()
+        pipe = client.pipeline()
+        for uid in uids:
+            key = self.__getKey(uid)
+            name = pipe.hget(key, TeacherStore.FIELD_NAME)
+            if name is None:
+                return None
+            verify = pipe.hget(key, TeacherStore.FIELD_VERIFY)
+            avatar = pipe.hget(key, TeacherStore.FIELD_AVATAR)
+            url = pipe.hget(key, TeacherStore.FIELD_URL)
+            fansCount = pipe.hget(key, TeacherStore.FIELD_FANS_COUNT)
+        results = pipe.execute()
+        rlist = []
+        for i in range(len(uids)):
+            uid = uids[i]
+            name = results[i*5]
+            verify = results[i*5+1]
+            avatar = results[i*5+2]
+            url = results[i*5+3]
+            fansCount = results[i*5+4]
+            if name is not None:
+                teacher = Teacher(uid, name, verify, fansCount, avatar, url)
+                rlist.append(teacher)
+        return rlist
+
+
 class FlagSet(AbsRedisStore):
     _key_prefix = 'wb:flag:'
     VALUE = 'V'
@@ -320,7 +365,12 @@ class FlagSet(AbsRedisStore):
 
 if __name__ == '__main__':
     userStore = UserStore()
+    teacherStore = TeacherStore()
     friendsStore = FriendsStore()
     queue = Queue()
 
-    print userStore.count()
+    print teacherStore.count()
+    uids = teacherStore.uids()
+    teachers = teacherStore.getTeachers(uids)
+    for teacher in teachers:
+        print teacher.verify
