@@ -238,7 +238,7 @@ class Queue(AbsRedisStore):
 
     def putFront(self, uid):
         client = self._bollowRedis()
-        client.zadd(self._key, 10000, uid)
+        client.zadd(self._key, uid, 10000)
 
     def count(self):
         client = self._bollowRedis()
