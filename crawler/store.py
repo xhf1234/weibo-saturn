@@ -2,7 +2,7 @@
 
 import redis
 from weibo import WeiboClient
-from data import User
+from data import User, Teacher
 from utils import Utils,Properties
 import const
 
@@ -12,10 +12,10 @@ class AbsRedisStore(object):
         return redis.StrictRedis(host=const.redisHost, port=6379, db=0)
 
 class NameIndexer(AbsRedisStore):
-    __key_prefix = 'wb:name:index:'
+    _key_prefix = 'wb:name:index:'
 
     def __getKey(self, name):
-        return self.__key_prefix + name;
+        return self._key_prefix + name;
 
     def setIndex(self, user):
         client = self._bollowRedis()
@@ -40,10 +40,10 @@ class UserStore(AbsRedisStore):
     FIELD_NAME = "name"
     FIELD_UID = "uid"
 
-    __key_prefix = "wb:user:"
+    _key_prefix = "wb:user:"
 
     def __getKey(self, uid):
-        return self.__key_prefix + str(uid)
+        return self._key_prefix + str(uid)
 
     def __extractId(self, key):
         return int(key[8:])
@@ -96,7 +96,7 @@ class UserStore(AbsRedisStore):
 
     def count(self):
         client = self._bollowRedis()
-        keys = client.keys(self.__key_prefix + "*")
+        keys = client.keys(self._key_prefix + "*")
         return len(keys)
 
 class FriendsStore(AbsRedisStore):
@@ -200,46 +200,123 @@ class FriendsStore(AbsRedisStore):
         return len(keys) + len(emptyKeys)
         
 class NameQueue(AbsRedisStore):
-    __key = "wb:name:queue"
+    _key = "wb:name:queue"
 
     def enqueue(self, name):
         client = self._bollowRedis()
-        client.rpush(self.__key, name)
+        client.rpush(self._key, name)
 
     def dequeue(self):
         client = self._bollowRedis()
-        return client.lpop(self.__key)
+        return client.lpop(self._key)
 
 class Queue(AbsRedisStore):
-    __key = "wb:queue"
+    _key = "wb:queue"
     
     def enqueue(self, uid):
         client = self._bollowRedis()
-        client.zincrby(self.__key, uid, 1)
+        client.zincrby(self._key, uid, 1)
 
     def enqueuePipe(self, uids):
         client = self._bollowRedis()
         pipe = client.pipeline()
         for uid in uids:
-            pipe.zincrby(self.__key, uid, 1)
+            pipe.zincrby(self._key, uid, 1)
         pipe.execute()
 
     def dequeue(self):
         client = self._bollowRedis()
-        tList = client.zrevrange(self.__key, 0, 0)
-        value = None
+        tList = client.zrevrange(self._key, 0, 0)
         if len(tList) > 0:
             value = tList[0]
-            client.zrem(self.__key, value)
-        return int(value)
+            client.zrem(self._key, value)
+            return int(value)
+        else:
+            return None
 
     def putFront(self, uid):
         client = self._bollowRedis()
-        client.zadd(self.__key, 10000, uid)
+        client.zadd(self._key, 10000, uid)
 
     def count(self):
         client = self._bollowRedis()
-        return client.zcard(self.__key)
+        return client.zcard(self._key)
+
+class TeacherQueue(Queue):
+    _key = "wb:teacher-queue"
+
+class TeacherStore(AbsRedisStore):
+ 
+    FIELD_UID = "uid"
+    FIELD_NAME = "name"
+    FIELD_FANS_COUNT = "fansCount"
+    FIELD_VERIFY = "verify"
+    FIELD_AVATAR = "avatar"
+    FIELD_URL = "url"
+
+    _key_prefix = "wb:teacher:"
+
+    def __getKey(self, uid):
+        return self._key_prefix + str(uid)
+
+    def __extractId(self, key):
+        return int(key[11:])
+
+    def uids(self):
+        client = self._bollowRedis()
+        keys = client.keys('wb:teacher:*')
+        return map(self.__extractId, keys)
+
+    def saveTeacher(self, teacher):
+        client = self._bollowRedis()
+        pipe = client.pipeline()
+        key = self.__getKey(teacher.uid)
+        pipe.hset(key, TeacherStore.FIELD_UID, teacher.uid)
+        pipe.hset(key, TeacherStore.FIELD_NAME, teacher.name)
+        pipe.hset(key, TeacherStore.FIELD_FANS_COUNT, teacher.fansCount)
+        pipe.hset(key, TeacherStore.FIELD_VERIFY, teacher.verify)
+        pipe.hset(key, TeacherStore.FIELD_AVATAR, teacher.avatar)
+        pipe.hset(key, TeacherStore.FIELD_URL, teacher.url)
+        pipe.execute()
+
+    def getTeacher(self, uid):
+        client = self._bollowRedis()
+        key = self.__getKey(uid)
+        name = client.hget(key, TeacherStore.FIELD_NAME)
+        if name is None:
+            return None
+        verify = client.hget(key, TeacherStore.FIELD_VERIFY)
+        avatar = client.hget(key, TeacherStore.FIELD_AVATAR)
+        url = client.hget(key, TeacherStore.FIELD_URL)
+        fansCount = client.hget(key, TeacherStore.FIELD_FANS_COUNT)
+        return Teacher(uid, name, verify, fansCount, avatar, url)
+
+    def exists(self, uid):
+        client = self._bollowRedis()
+        key = self.__getKey(uid)
+        return client.exists(key)
+
+    def count(self):
+        client = self._bollowRedis()
+        keys = client.keys(self._key_prefix + "*")
+        return len(keys)
+
+class FlagSet(AbsRedisStore):
+    _key_prefix = 'wb:flag:'
+    VALUE = 'V'
+
+    def _getKey(self, type, id):
+        return self._key_prefix + type + ':' + str(id)
+
+    def set(self, type, id):
+        client = self._bollowRedis()
+        key = self._getKey(type, id)
+        client.set(key, self.VALUE)
+
+    def exists(self, type, id):
+        client = self._bollowRedis()
+        key = self._getKey(type, id)
+        return client.exists(key)
 
 if __name__ == '__main__':
     userStore = UserStore()
