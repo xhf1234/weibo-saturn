@@ -94,7 +94,10 @@ class Teacher(object):
             avatar = avatar.encode("UTF-8")
         if isinstance(url, unicode):
             url = url.encode("UTF-8")
-        return Teacher(uid, name, verify, fansCount, avatar, url)
+        teacher = Teacher.decodeFromDict(dictValue)
+        if '主持人' in teacher.verify:
+            return teacher
+        return None
 
     @staticmethod
     def decodeList(strJson):
