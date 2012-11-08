@@ -69,7 +69,7 @@ class Teacher(object):
         dictValue = json.loads(jsonValue)
         if dictValue['verified'] is False:
             return None
-        return = Teacher.decodeFromDict(dictValue)
+        return Teacher.decodeFromDict(dictValue)
 
     @staticmethod
     def decodeFromDict(dictValue): 
@@ -103,7 +103,8 @@ class Teacher(object):
         teacherList = []
         for v in tList:
             u = Teacher.decodeFromDict(v)
-            teacherList.append(u)
+            if u is not None:
+                teacherList.append(u)
         return teacherList
 
     def __str__(self):
