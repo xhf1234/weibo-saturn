@@ -69,7 +69,7 @@ def main():
                 access_token = const.accessToken
             if e.status != 400:
                 queue.putFront(uid)
-            time.sleep(60)
+                time.sleep(60)
             continue
 
 if __name__ == '__main__':
