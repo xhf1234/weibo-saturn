@@ -43,7 +43,10 @@ def main():
                     teacher = client.getTeacher(uid, access_token)
                     print 'teacher :', teacher
                     print 'save teacher'
-                    teacherStore.saveTeacher(teacher)
+                    if teacher is not None:
+                        teacherStore.saveTeacher(teacher)
+                    else:
+                        queue.enqueue(uid)
                 print teacher
                 if teacher is not None:
                     print 'step 3. check if teacher follows crawled'

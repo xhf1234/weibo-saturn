@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#coding=UTF-8
 
 import json
 
@@ -68,7 +69,10 @@ class Teacher(object):
         dictValue = json.loads(jsonValue)
         if dictValue['verified'] is False:
             return None
-        return Teacher.decodeFromDict(dictValue)
+        teacher = Teacher.decodeFromDict(dictValue)
+        if '主持人' in teacher.verify:
+            return teacher
+        return None
 
     @staticmethod
     def decodeFromDict(dictValue): 
