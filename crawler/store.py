@@ -12,6 +12,9 @@ class AbsRedisStore(object):
     def _bollowRedis(self):
         return redis.StrictRedis(host=const.redisHost, port=6379, db=0)
 
+    def getKey(self, uid):
+        return '%s%d' %(self._key_prefix, uid)
+
 class NameIndexer(AbsRedisStore):
     _key_prefix = 'wb:name:index:'
 
@@ -372,18 +375,32 @@ class FlagSet(AbsRedisStore):
             pipe.delete(key)
         pipe.execute()
 
+class TeacherSort(AbsRedisStore):
+    _key = 'wb:teacher-sort'
+
+    def add(self, teacher):
+        client = self._bollowRedis()
+        client.zadd(self._key, (0-teacher.fansCount), teacher.uid)
+
+    def range(self, offset, limit):
+        client = self._bollowRedis()
+        uids = client.zrange(self._key, offset, offset+limit-1)
+        return map(int, uids)
+
+    def count(self):
+        client = self._bollowRedis()
+        return client.zcard(self._key)
+
+
 if __name__ == '__main__':
     userStore = UserStore()
     teacherStore = TeacherStore()
+    teacherSort = TeacherSort()
     friendsStore = FriendsStore()
     queue = Queue()
+    teacherQueue = TeacherQueue()
     flagSet = FlagSet()
 
     print teacherStore.count()
-    uids = teacherStore.uids()
-    teachers = teacherStore.getTeachers(uids)
-    for teacher in teachers:
-        if '主持人' in teacher.verify:
-            print teacher.verify
-
-
+    print teacherSet.count()
+    print teacherQueue.count()
