@@ -402,5 +402,5 @@ if __name__ == '__main__':
     flagSet = FlagSet()
 
     print teacherStore.count()
-    print teacherSet.count()
+    print teacherSort.count()
     print teacherQueue.count()
