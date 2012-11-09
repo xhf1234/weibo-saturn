@@ -7,10 +7,12 @@ from data import User, Teacher
 from utils import Utils,Properties
 import const
 
+pool = redis.ConnectionPool(host=const.redisHost, port=6379, db=0)
+
 class AbsRedisStore(object):
     
     def _bollowRedis(self):
-        return redis.StrictRedis(host=const.redisHost, port=6379, db=0)
+        return redis.Redis(connection_pool = pool)
 
     def getKey(self, uid):
         return '%s%d' %(self._key_prefix, uid)

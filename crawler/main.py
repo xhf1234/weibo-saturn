@@ -59,6 +59,11 @@ def main():
             queue.putFront(uid)
             time.sleep(60)
             continue
+        except:
+            print 'exception'
+            queue.putFront(uid)
+            time.sleep(60)
+            continue
         friendIds = User.extractIds(friends)
         if len(friendIds)==0:
             print 'empty friends, uid=%d' % uid
