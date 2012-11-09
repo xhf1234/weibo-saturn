@@ -26,7 +26,14 @@
         });
     };
 
-    exports.serveHtml = function (req, resp, file) {
+    exports.serveVm = function (req, resp, file) {
+        var view = require('./lib/liteview');
+        resp.writeHead(200, { 'Content-Type': 'text/html'});
+        var content = view.render(file);
+        resp.end(content, 'utf-8');
+    };
+
+    exports.serveHtml  = function (req, resp, file) {
         serveFile(req, resp, 'front/html/' + file, 'text/html');
     };
 

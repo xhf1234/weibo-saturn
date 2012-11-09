@@ -45,11 +45,6 @@
                         if (error) {
                             onError(req, resp, error);
                         } else {
-                            var view = require('liteview');
-                            var path = require('path');
-                            var tpl_base = path.normalize(__dirname + '/../front/html/weibo');
-                            view.init(tpl_base);
-                            view.debug(true);
                             Store.getFriendIds(uid, function (error, friendIds) {
                                 if (error) {
                                     onError(req, resp, error);
@@ -73,7 +68,8 @@
                                                     var data = {};
                                                     data.user = JSON.stringify(user);
                                                     data.friends = JSON.stringify(friends);
-                                                    var html = view.render('clique.html', data);
+                                                    var view = require('../lib/liteview');
+                                                    var html = view.render('weibo/clique.vm', data);
                                                     resp.writeHead(200, { 'Content-Type': 'text/html'});
                                                     resp.end(html, 'utf-8');
                                                     Store.putQueueFrontPipe(friendIds);
@@ -110,11 +106,6 @@
                         if (error) {
                             onError(req, resp, error);
                         } else {
-                            var view = require('liteview');
-                            var path = require('path');
-                            var tpl_base = path.normalize(__dirname + '/../front/html/weibo');
-                            view.init(tpl_base);
-                            view.debug(true);
                             Store.getFriends(uid, function (error, friends) {
                                 if (error) {
                                     onError(req, resp, error);
@@ -122,7 +113,8 @@
                                     var data = {};
                                     data.user = JSON.stringify(user);
                                     data.friends = JSON.stringify(friends);
-                                    var html = view.render('relation.html', data);
+                                    var view = require('../lib/liteview');
+                                    var html = view.render('weibo/relation.vm', data);
                                     resp.writeHead(200, { 'Content-Type': 'text/html'});
                                     resp.end(html, 'utf-8');
                                 }
@@ -183,16 +175,11 @@
                                                 if (error) {
                                                     onError(req, resp, error);
                                                 } else {
-                                                    var view = require('liteview');
-                                                    var path = require('path');
-                                                    var tpl_base = path.normalize(__dirname + '/../front/html/weibo');
-                                                    view.init(tpl_base);
-                                                    view.debug(true);
-
+                                                    var view = require('../lib/liteview');
                                                     var data = {};
                                                     data.users = JSON.stringify(users);
                                                     console.log('data.users = ' + data.users);
-                                                    var html = view.render('path.html', data);
+                                                    var html = view.render('weibo/path.vm', data);
                                                     resp.writeHead(200, { 'Content-Type': 'text/html'});
                                                     resp.end(html, 'utf-8');
                                                 }
