@@ -89,6 +89,11 @@ def sortTeachers():
     for teacher in teachers:
         teacherSort.add(teacher)
 
+def filterEmptyTeacher():
+    uids = teacherStore.uids()
+    ids = teacherSort.uids()
+    print ids
+
 def filterTeachers():
     uids = teacherStore.uids()
     teachers = teacherStore.getTeachers(uids)
@@ -119,6 +124,8 @@ def main(arg):
         filterTeachers()
     elif cmd == 'sortTeacher':
         sortTeachers()
+    elif cmd == 'filterEmptyTeacher':
+        filterEmptyTeacher()
 
 if __name__ == '__main__':
     del sys.argv[0]

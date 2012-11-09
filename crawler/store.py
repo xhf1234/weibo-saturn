@@ -382,7 +382,7 @@ class TeacherSort(AbsRedisStore):
 
     def add(self, teacher):
         client = self._bollowRedis()
-        client.zadd(self._key, (0-teacher.fansCount), teacher.uid)
+        client.zadd(self._key, teacher.uid, (0-teacher.fansCount))
 
     def range(self, offset, limit):
         client = self._bollowRedis()
@@ -393,6 +393,9 @@ class TeacherSort(AbsRedisStore):
         client = self._bollowRedis()
         return client.zcard(self._key)
 
+    def uids(self):
+        count = self.count()
+        return self.range(0, count-1)
 
 if __name__ == '__main__':
     userStore = UserStore()
