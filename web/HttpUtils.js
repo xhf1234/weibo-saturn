@@ -26,11 +26,21 @@
         });
     };
 
-    exports.serveVm = function (req, resp, file) {
-        var view = require('./lib/liteview');
-        resp.writeHead(200, { 'Content-Type': 'text/html'});
-        var content = view.render(file);
-        resp.end(content, 'utf-8');
+    exports.serveHandlebars = function (req, resp, file) {
+        var handlebars = require('./lib/handlebars');
+        file = __dirname + '/front/template/' + file;
+        require('fs').readFile(file, function (error, content) {
+            if (error) {
+                console.error(error);
+                resp.writeHead(404);
+                resp.end('404, read file error:' + file);
+            } else {
+                var pageName = require('path').basename(file, '.handlebars');
+                content = handlebars.render(content, {pageName: pageName});
+                resp.writeHead(200, { 'Content-Type': 'text/html'});
+                resp.end(content, 'utf-8');
+            }
+        });
     };
 
     exports.serveHtml  = function (req, resp, file) {

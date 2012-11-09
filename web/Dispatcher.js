@@ -22,16 +22,16 @@
         }, this);
         if (!handled) {
             if (!path) {
-                path = 'index.vm';
+                path = 'index.handlebars';
             }
             var extname = require('path').extname(path);
             switch (extname) {
             case '':
-                require('./HttpUtils').serveVm(req, resp, path + '.vm');
+                require('./HttpUtils').servehHandlebars(req, resp, path + '.handlebars');
                 handled = true;
                 break;
-            case '.vm':
-                require('./HttpUtils').serveVm(req, resp, path);
+            case '.handlebars':
+                require('./HttpUtils').serveHandlebars(req, resp, path);
                 handled = true;
                 break;
             case '.html':

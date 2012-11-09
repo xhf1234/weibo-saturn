@@ -68,8 +68,8 @@
                                                     var data = {};
                                                     data.user = JSON.stringify(user);
                                                     data.friends = JSON.stringify(friends);
-                                                    var view = require('../lib/liteview');
-                                                    var html = view.render('weibo/clique.vm', data);
+                                                    var handlebars = require('../lib/handlebars');
+                                                    var html = handlebars.renderFile('weibo/clique.handlebars', data);
                                                     resp.writeHead(200, { 'Content-Type': 'text/html'});
                                                     resp.end(html, 'utf-8');
                                                     Store.putQueueFrontPipe(friendIds);
@@ -113,8 +113,8 @@
                                     var data = {};
                                     data.user = JSON.stringify(user);
                                     data.friends = JSON.stringify(friends);
-                                    var view = require('../lib/liteview');
-                                    var html = view.render('weibo/relation.vm', data);
+                                    var handlebars = require('../lib/handlebars');
+                                    var html = handlebars.renderFile('weibo/relation.handlebars', data);
                                     resp.writeHead(200, { 'Content-Type': 'text/html'});
                                     resp.end(html, 'utf-8');
                                 }
@@ -175,11 +175,11 @@
                                                 if (error) {
                                                     onError(req, resp, error);
                                                 } else {
-                                                    var view = require('../lib/liteview');
                                                     var data = {};
                                                     data.users = JSON.stringify(users);
                                                     console.log('data.users = ' + data.users);
-                                                    var html = view.render('weibo/path.vm', data);
+                                                    var handlebars = require('../lib/handlebars');
+                                                    var html = handlebars.renderFile('weibo/path.handlebars', data);
                                                     resp.writeHead(200, { 'Content-Type': 'text/html'});
                                                     resp.end(html, 'utf-8');
                                                 }
