@@ -4,7 +4,7 @@
 define(function (require, exports, module) {
     "use strict";
 
-    var Backbone = window.Backbone;
+    var Backbone = require('../lib/backbone');
 
     var Form = Backbone.View.extend({
         el: 'form#form-relation',

@@ -207,6 +207,26 @@
             }
         });
     };
+    var HostHandler = Handler.extend('hosts', 'GET');
+    HostHandler.prototype.handle = function (req, resp) {
+        var params = require('../HttpUtils').getParams(req);
+        var page = params.page;
+        var Store = require('../Store');
+        Store.rangeHostUids(page * 30, 30, function (error, uids) {
+            if (error) {
+                onError(req, resp, error);
+            } else {
+                Store.getHosts(uids, function (error, hosts) {
+                    if (error) {
+                        onError(req, resp, error);
+                    } else {
+                        resp.writeHead(200, { 'Content-Type': 'application/json'});
+                        resp.end(JSON.stringify(hosts), 'utf-8');
+                    }
+                });
+            }
+        });
+    };
 
     var ctrl = new WeiboController();
     ctrl.addHandler(new GetUserHandler());
@@ -214,5 +234,6 @@
     ctrl.addHandler(new CliqueHandler());
     ctrl.addHandler(new ExpandHandler());
     ctrl.addHandler(new PathHandler());
+    ctrl.addHandler(new HostHandler());
     ctrl.init();
 }());

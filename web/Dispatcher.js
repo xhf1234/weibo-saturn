@@ -27,7 +27,7 @@
             var extname = require('path').extname(path);
             switch (extname) {
             case '':
-                require('./HttpUtils').servehHandlebars(req, resp, path + '.handlebars');
+                require('./HttpUtils').serveHandlebars(req, resp, path + '.handlebars');
                 handled = true;
                 break;
             case '.handlebars':

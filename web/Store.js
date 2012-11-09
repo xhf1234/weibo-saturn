@@ -14,6 +14,8 @@
     var queue = new Queue();
     var NameQueue = require('./store/NameQueue');
     var nameQueue = new NameQueue();
+    var HostStore = require('./store/HostStore');
+    var hostStore = new HostStore();
 
     /* 
      * get user id by name
@@ -95,4 +97,8 @@
      * param callback(error)
      */
     exports.enqueueName = nameQueue.enqueueName.bind(nameQueue);
+
+    exports.rangeHostUids = hostStore.range.bind(hostStore);
+
+    exports.getHosts = hostStore.getHostPipe.bind(hostStore);
 }());

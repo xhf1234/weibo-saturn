@@ -4,7 +4,7 @@
 define(function (require, exports, module) {
     "use strict";
 
-    var $ = window.jQuery.noConflict();
+    var $ = require('jquery');
     var RelationForm = require('/view/RelationForm');
     var CliqueForm = require('/view/CliqueForm');
 
