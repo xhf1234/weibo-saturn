@@ -11,6 +11,7 @@ import sys
 queue = TeacherQueue()
 userStore = UserStore()
 teacherStore = TeacherStore()
+teacherSort = TeacherSort()
 friendsStore = FriendsStore()
 nameQueue = NameQueue()
 client = WeiboClient()
@@ -60,7 +61,7 @@ def main():
                             print 'craw teacher', u
                             print 'step 5. save teacher and enqueue teacher.uid'
                             teacherStore.saveTeacher(u)
-                            teacherSort.add(teacher)
+                            teacherSort.add(u)
                             queue.enqueue(u.uid)
             else:
                 break
