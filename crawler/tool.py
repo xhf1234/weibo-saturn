@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #coding=UTF-8
 import sys
-from store import Queue, UserStore, FriendsStore, NameIndexer, TeacherStore
+from store import Queue, UserStore, FriendsStore, NameIndexer, TeacherStore, TeacherSort
 from weibo import WeiboClient, ApiException
 from data import User, Teacher
 import time
@@ -11,6 +11,7 @@ import string
 friendsStore = FriendsStore()
 userStore = UserStore()
 teacherStore = TeacherStore()
+teacherSort = TeacherSort()
 queue = Queue()
 indexer = NameIndexer()
 client = WeiboClient()
@@ -81,6 +82,12 @@ def startIndex():
     uids = userStore.uids()
     users = userStore.getUsers(uids)
     indexer.setIndexPipe(users)
+    
+def sortTeachers():
+    uids = teacherStore.uids()
+    teachers = teacherStore.getTeachers(uids)
+    for teacher in teachers:
+        teacherSort.add(teacher)
 
 def filterTeachers():
     uids = teacherStore.uids()
@@ -110,6 +117,8 @@ def main(arg):
         print indexer.getIndex(arg[1])
     elif cmd == 'filterTeacher':
         filterTeachers()
+    elif cmd == 'sortTeacher':
+        sortTeachers()
 
 if __name__ == '__main__':
     del sys.argv[0]

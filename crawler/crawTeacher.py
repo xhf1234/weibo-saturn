@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from store import TeacherQueue, UserStore, FriendsStore, NameQueue, FlagSet, TeacherStore
+from store import TeacherQueue, UserStore, FriendsStore, NameQueue, FlagSet, TeacherStore, TeacherSort
 from weibo import WeiboClient, ApiException
 from data import User
 import time
@@ -45,6 +45,8 @@ def main():
                     print 'save teacher'
                     if teacher is not None:
                         teacherStore.saveTeacher(teacher)
+                        print 'sort teacher'
+                        teacherSort.add(teacher)
                     else:
                         queue.enqueue(uid)
                 print teacher
@@ -58,6 +60,7 @@ def main():
                             print 'craw teacher', u
                             print 'step 5. save teacher and enqueue teacher.uid'
                             teacherStore.saveTeacher(u)
+                            teacherSort.add(teacher)
                             queue.enqueue(u.uid)
             else:
                 break
