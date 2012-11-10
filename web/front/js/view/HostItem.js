@@ -10,15 +10,14 @@ define(function (require, exports, module) {
     var BaseView = require('./BaseView');
     
     var HostItem = BaseView.extend({
-        tagName: 'div',
+        tagName: 'li',
 
-        className: 'host-item-wrap',
+        className: 'host-item-wrap span2',
 
         tmpl: require('/weibo/host/HostItem.handlebars'),
 
         render: function (renderData) {
-            var data = {name: 'hello'};
-            this.template(data);
+            this.el.innerHTML = this.template(renderData);
         }
     });
     

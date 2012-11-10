@@ -13,8 +13,7 @@ define(function (require, exports, module) {
         template : function (data) {
             var handlebars = require('../lib/handlebars');
             var template = handlebars.compile(this.tmpl.template);
-            data = template(data);
-            console.log('data = ' + data);
+            return template(data);
         }
     });
     

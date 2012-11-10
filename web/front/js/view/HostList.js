@@ -27,8 +27,13 @@ define(function (require, exports, module) {
         },
 
         doLoadPage: function () {
-            this.el.innerHTML = this.collection.toJSON().toString();
-            new HostItem().render();
+            var hosts = this.collection.toJSON();
+            hosts.forEach(function (host) {
+                var item = new HostItem();
+                item.render(host);
+                this.$el.append(item.$el);
+            }, this);
+            
         }
     });
     
