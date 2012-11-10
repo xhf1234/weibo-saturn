@@ -4,14 +4,12 @@
 define(function (require, exports, module) {
     "use strict";
 
-    var HostCollection = require('./collection/HostCollection');
-    var collection = new HostCollection();
-    var options = {
-        data: {page: 0},
-        success: function (collection, response) {
-            var hosts = collection.toJSON();
-        }
-    };
-    collection.fetch(options);
+    var $ = require('./lib/jquery');
+    var HostList = require('./view/HostList');
+
+    var list = new HostList({
+        el: '.host-list-wrap'
+    });
+    list.render();
 });
 

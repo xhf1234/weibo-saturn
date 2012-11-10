@@ -9,7 +9,15 @@ define(function (require, exports, module) {
     var Host = Backbone.Collection.extend({
         model: require('../model/HostModel'),
 
-        url: 'weibo/hosts'
+        url: 'weibo/hosts',
+
+        loadPage: function (page, callback) {
+            var options = {
+                data: {page: page},
+                success: callback
+            };
+            this.fetch(options);
+        }
     });
 
     return Host;

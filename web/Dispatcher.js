@@ -24,7 +24,13 @@
             if (!path) {
                 path = 'index.handlebars';
             }
-            var extname = require('path').extname(path);
+            var extname = null;
+            if (require('./util/StringUtils').endWith(path, '.handlebars.js')) {
+                extname = '.handlebars.js';
+                path = path.substr(0, path.length - 3);
+            } else {
+                extname = require('path').extname(path);
+            }
             switch (extname) {
             case '':
                 require('./HttpUtils').serveHandlebars(req, resp, path + '.handlebars');
@@ -32,6 +38,10 @@
                 break;
             case '.handlebars':
                 require('./HttpUtils').serveHandlebars(req, resp, path);
+                handled = true;
+                break;
+            case '.handlebars.js':
+                require('./HttpUtils').serveHandlebarsJs(req, resp, path);
                 handled = true;
                 break;
             case '.html':

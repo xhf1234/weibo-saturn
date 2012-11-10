@@ -5,8 +5,9 @@ define(function (require, exports, module) {
     "use strict";
 
     var Backbone = window.Backbone;
+    var BaseView = require('./BaseView');
 
-    var Form = Backbone.View.extend({
+    var Form = BaseView.extend({
         el: 'div#form-path',
 
         events: {

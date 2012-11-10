@@ -6,20 +6,29 @@
 
     var handlebars = require('handlebars');
 
-    handlebars.render = function (template, data) {
+    handlebars.createTemplate = function (template) {
         if (typeof template !== 'string') {
             template = template.toString();
         }
-        template = handlebars.compile(template);
+        return handlebars.compile(template);
+    };
+
+    handlebars.createTemplateFromFile = function (file) {
+        var template = require('fs').readFileSync(require('path').normalize(__dirname + '/../front/template/' + file), 'UTF-8');
+        return handlebars.createTemplate(template);
+    };
+
+    handlebars.render = function (template, data) {
+        template = handlebars.createTemplate(template);
         return template(data);
     };
 
     handlebars.renderFile = function (file, data) {
-        var template = require('fs').readFileSync(require('path').normalize(__dirname + '/../front/template/' + file), 'UTF-8');
         var pageName = require('path').basename(file, '.handlebars');
         data = data || {};
         data.pageName = data.pageName || pageName;
-        return handlebars.render(template, data);
+        var template = handlebars.createTemplateFromFile(file);
+        return template(data);
     };
 
     var getPartial = function (file) {

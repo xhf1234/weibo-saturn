@@ -27,7 +27,6 @@
     };
 
     exports.serveHandlebars = function (req, resp, file) {
-        var handlebars = require('./lib/handlebars');
         file = __dirname + '/front/template/' + file;
         require('fs').readFile(file, function (error, content) {
             if (error) {
@@ -36,6 +35,7 @@
                 resp.end('404, read file error:' + file);
             } else {
                 var pageName = require('path').basename(file, '.handlebars');
+                var handlebars = require('./lib/handlebars');
                 content = handlebars.render(content, {pageName: pageName});
                 resp.writeHead(200, { 'Content-Type': 'text/html'});
                 resp.end(content, 'utf-8');
@@ -59,18 +59,18 @@
         serveFile(req, resp, 'front/js/' + file, 'text/javascript');
     };
 
-    exports.serveMustache = function (req, resp, file) {
-        file = 'front/mustache/' + file;
+    exports.serveHandlebarsJs = function (req, resp, file) {
+        file = __dirname + '/front/template/' + file;
         require('fs').readFile(file, function (error, content) {
             if (error) {
+                console.error(error);
                 resp.writeHead(404);
                 resp.end('404, read file error:' + file);
             } else {
-                var output = {
-                    template: content.toString()
-                };
+                content = content.toString();
+                var output = {template: content};
                 output = JSON.stringify(output);
-                content = 'define(function (require, exports, module) {return  ' + output + ';});';
+                content = 'define(function (require, exports, module) {return ' + output + ';});';
                 resp.writeHead(200, { 'Content-Type': 'text/javascript'});
                 resp.end(content, 'utf-8');
             }
