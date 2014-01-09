@@ -2,11 +2,10 @@ weib-saturn
 ============
 
 ## Description
-
 crawl user relation from weibo.com, build the relation graph, including:
+
 1. Weibo crawler in Python
 1. Web UI in Nodejs
-1. 
 
 ## Technology Stack
 1. Python
